@@ -1,0 +1,47 @@
+.root{
+-fx-background-color: radial-gradient(center 100% 0%, radius 20%, white, yellow, lightblue);
+}
+.subScene2D{
+-fx-background-color: radial-gradient(center 100% 0%, radius 20%, white, Grey, Black);
+}
+.subScene3D{
+-fx-background-color: radial-gradient(center 100% 0%, radius 20%, white, yellow, Green);
+}
+.button {
+-fx-background-color: darkblue;
+-fx-text-fill: white;
+-fx-font-size: 20px;
+}
+.check-box{
+-fx-text-fill: white;
+}
+.button:hover{
+-fx-background-color: green;
+}
+.buttonExit{
+-fx-background-color: white;
+-fx-text-fill: black;
+}
+.buttonExit:hover{
+-fx-background-color: red;
+-fx-text-fill: white;
+}
+.text-field {
+-fx-font-size: 15px;
+-fx-font-family: courier;
+-fx-text-fill: white;
+-fx-background-color: darkblue;
+}
+.slider{
+-fx-background-color: transparent;
+-fx-text-fill: white;
+}
+.slider .axis {
+    -fx-tick-label-fill: white;
+}
+
+.label{
+-fx-background-color: transparent;
+-fx-text-fill: darkblue;
+}
+
