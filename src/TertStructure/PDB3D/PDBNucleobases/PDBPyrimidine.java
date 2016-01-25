@@ -17,6 +17,7 @@ public class PDBPyrimidine
     private Point3D C4;
     private Point3D C5;
     private Point3D C6;
+    private Point3D H5, H6;
 
     protected MeshView meshV;
     public void setNucleobaseColor(PhongMaterial phongM)
@@ -30,7 +31,6 @@ public class PDBPyrimidine
     public void setO2(Point3D o2) {
         O2 = o2;
     }
-
 
     public Point3D getN1() {
         return N1;
@@ -78,5 +78,21 @@ public class PDBPyrimidine
 
     public void setC6(Point3D c6) {
         C6 = c6;
+    }
+
+    public Point3D getH5() {
+        return H5;
+    }
+
+    public void setH5(Point3D h5) {
+        H5 = h5;
+    }
+
+    public Point3D getH6() {
+        return H6;
+    }
+
+    public void setH6(Point3D h6) {
+        H6 = h6;
     }
 }

@@ -90,6 +90,9 @@ public class PDBUridine extends PDBNucleotide
             case("N3"): uri.setN3(xyz); break;
             case("O4"): uri.setO4(xyz); break;
             case("O2"): uri.setO2(xyz); break;
+            case("H3"): uri.setH3(xyz); break;
+            case("H5"): uri.setH5(xyz); break;
+            case("H6"): uri.setH6(xyz); break;
 
         }
 
@@ -108,7 +111,7 @@ public class PDBUridine extends PDBNucleotide
         DrawLine c1toN1 = new DrawLine(ribo.getC1(), uri.getN1());
         // Connect ribose and phosphate
         DrawLine o5ToP = new DrawLine(ribo.getO5(), pbb.getP());
-        uridineGrp.getChildren().addAll(c1toN1.getStructure(), o5ToP.getStructure());
+        uridineGrp.getChildren().addAll(c1toN1, o5ToP);
         // Add tooltip
         Tooltip.install(uridineGrp, new Tooltip("Uri_"+this.getResIndex()));
         return uridineGrp;

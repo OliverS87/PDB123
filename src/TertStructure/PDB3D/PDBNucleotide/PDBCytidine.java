@@ -61,7 +61,7 @@ public class PDBCytidine extends PDBNucleotide
         DrawLine c1toN1 = new DrawLine(ribo.getC1(), cyt.getN1());
         // Connect ribose and phosphat
         DrawLine o5ToP = new DrawLine(ribo.getO5(), pbb.getP());
-        cytidineGrp.getChildren().addAll(c1toN1.getStructure(), o5ToP.getStructure());
+        cytidineGrp.getChildren().addAll(c1toN1, o5ToP);
         // Add tooltip
         Tooltip.install(cytidineGrp, new Tooltip("Cyt_"+this.getResIndex()));
         return cytidineGrp;
@@ -127,6 +127,10 @@ public class PDBCytidine extends PDBNucleotide
             case("N3"): cyt.setN3(xyz); break;
             case("N4"): cyt.setN4(xyz); break;
             case("O2"): cyt.setO2(xyz); break;
+            case("H41"): cyt.setH41(xyz); break;
+            case("H42"): cyt.setH42(xyz); break;
+            case("H5"): cyt.setH5(xyz); break;
+            case("H6"): cyt.setH6(xyz); break;
 
         }
 

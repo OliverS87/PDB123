@@ -1,5 +1,7 @@
 package TertStructure.PDB3D.PDBSugar;
 
+import TertStructure.RNAMesh3D.DrawCarbon;
+import TertStructure.RNAMesh3D.DrawOxygen;
 import javafx.geometry.Point3D;
 import javafx.scene.Group;
 import javafx.scene.paint.Color;
@@ -102,26 +104,14 @@ public class PDBRibose
         riboseMesh.setMaterial(new PhongMaterial(Color.BURLYWOOD));
         riboseGrp.getChildren().add(riboseMesh);
         // Draw connected C5 and O5
-        Sphere carbon5 = new Sphere(0.35/1.5);
-        carbon5.setTranslateX(C5.getX());
-        carbon5.setTranslateY(C5.getY());
-        carbon5.setTranslateZ(C5.getZ());
-        carbon5.setMaterial(new PhongMaterial(Color.CHOCOLATE));
+        DrawCarbon carbon5 = new DrawCarbon(C5);
         DrawLine c4ToC5 = new DrawLine(C4,C5);
-        Sphere oxygen5 = new Sphere(0.35/2);
-        oxygen5.setTranslateX(O5.getX());
-        oxygen5.setTranslateY(O5.getY());
-        oxygen5.setTranslateZ(O5.getZ());
-        oxygen5.setMaterial(new PhongMaterial(Color.RED));
+        DrawOxygen oxygen5 = new DrawOxygen(O5);
         DrawLine c5ToO5 = new DrawLine(C5,O5);
         // Draw O3 connected to C3
-        Sphere oxygen3 = new Sphere(0.35/2);
-        oxygen3.setTranslateX(O3.getX());
-        oxygen3.setTranslateY(O3.getY());
-        oxygen3.setTranslateZ(O3.getZ());
-        oxygen3.setMaterial(new PhongMaterial(Color.RED));
+        DrawOxygen oxygen3 = new DrawOxygen(O3);
         DrawLine o3ToC3 = new DrawLine(O3,C3);
-        riboseGrp.getChildren().addAll(carbon5, c4ToC5.getStructure(), oxygen5, c5ToO5.getStructure(), o3ToC3.getStructure(), oxygen3);
+        riboseGrp.getChildren().addAll(carbon5, c4ToC5, oxygen5, c5ToO5, o3ToC3, oxygen3);
         return riboseGrp;
     }
 }

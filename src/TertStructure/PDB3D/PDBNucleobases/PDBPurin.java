@@ -10,7 +10,7 @@ import javafx.scene.shape.MeshView;
  */
 public abstract class PDBPurin
 {
-    private Point3D N1, C2, N3, C4, N9, C8, N7, C5, C6;
+    private Point3D N1, C2, N3, C4, N9, C8, N7, C5, C6, H8;
     protected MeshView meshV;
     public void setNucleobaseColor(PhongMaterial phongM)
     {
@@ -86,5 +86,13 @@ public abstract class PDBPurin
 
     public void setC6(Point3D c6) {
         C6 = c6;
+    }
+
+    public Point3D getH8() {
+        return H8;
+    }
+
+    public void setH8(Point3D h8) {
+        H8 = h8;
     }
 }

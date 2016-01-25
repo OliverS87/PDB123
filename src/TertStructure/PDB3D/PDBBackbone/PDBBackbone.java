@@ -1,5 +1,7 @@
 package TertStructure.PDB3D.PDBBackbone;
 
+import TertStructure.RNAMesh3D.DrawOxygen;
+import TertStructure.RNAMesh3D.DrawPhosphat;
 import javafx.geometry.Point3D;
 import javafx.scene.Group;
 import javafx.scene.paint.Color;
@@ -43,26 +45,15 @@ public class PDBBackbone {
         // Check if phosphat is present (not found in first residue of chain)
         if (P==null) return backboneGrp;
         // Draw Phosphat
-        Sphere phosphat = new Sphere(0.35);
-        phosphat.setTranslateX(P.getX());
-        phosphat.setTranslateY(P.getY());
-        phosphat.setTranslateZ(P.getZ());
-        phosphat.setMaterial(new PhongMaterial(Color.PURPLE));
+        DrawPhosphat phosphat = new DrawPhosphat(P);
         // Draw Oxygens
-        Sphere oxygen1 = new Sphere(0.35/2);
-        oxygen1.setTranslateX(OP1.getX());
-        oxygen1.setTranslateY(OP1.getY());
-        oxygen1.setTranslateZ(OP1.getZ());
-        oxygen1.setMaterial(new PhongMaterial(Color.RED));
-        Sphere oxygen2 = new Sphere(0.35/2);
-        oxygen2.setTranslateX(OP2.getX());
-        oxygen2.setTranslateY(OP2.getY());
-        oxygen2.setTranslateZ(OP2.getZ());
-        oxygen2.setMaterial(new PhongMaterial(Color.RED));
+        DrawOxygen oxygen1=new DrawOxygen(OP1);
+        DrawOxygen oxygen2=new DrawOxygen(OP2);
+
         // Connect Phosphat and oxygens
         DrawLine pToOp1 = new DrawLine(P, OP1);
         DrawLine pToOp2 = new DrawLine(P, OP2);
-        backboneGrp.getChildren().addAll(phosphat, oxygen1, oxygen2, pToOp1.getStructure(), pToOp2.getStructure());
+        backboneGrp.getChildren().addAll(phosphat, oxygen1, oxygen2, pToOp1, pToOp2);
         return backboneGrp;
     }
 }

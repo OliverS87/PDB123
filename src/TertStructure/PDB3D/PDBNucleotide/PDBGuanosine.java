@@ -92,6 +92,12 @@ public class PDBGuanosine extends PDBNucleotide
             case("C6"): gua.setC6(xyz); break;
             case("C8"): gua.setC8(xyz); break;
             case("O2"): gua.setO2(xyz); break;
+            case("H8"): gua.setH8(xyz); break;
+            case("H1"): gua.setH1(xyz); break;
+            case("H21"): gua.setH22(xyz); break;
+            case("H22"): gua.setH21(xyz); break;
+            case("O6"): gua.setO6(xyz); break;
+            case("N2"): gua.setN2(xyz); break;
 
         }
 
@@ -108,11 +114,11 @@ public class PDBGuanosine extends PDBNucleotide
         // Check if phosphat is present (not available in first residue of chain)
         if (pbb.getP() == null)
         {
-            guanosineGrp.getChildren().addAll(c1ToN9.getStructure());
+            guanosineGrp.getChildren().addAll(c1ToN9);
             return guanosineGrp;
         }
         DrawLine o5ToP = new DrawLine(ribo.getO5(), pbb.getP());
-        guanosineGrp.getChildren().addAll(c1ToN9.getStructure(), o5ToP.getStructure());
+        guanosineGrp.getChildren().addAll(c1ToN9, o5ToP);
         // Add tooltip
         Tooltip.install(guanosineGrp, new Tooltip("Gua_"+this.getResIndex()));
         return guanosineGrp;

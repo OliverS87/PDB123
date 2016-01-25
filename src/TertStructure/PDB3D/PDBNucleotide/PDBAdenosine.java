@@ -32,6 +32,7 @@ public class PDBAdenosine extends PDBNucleotide
     private PDBBackbone pbb;
 
 
+
     public PDBAdenosine() {
         this.ribo = new PDBRibose();
         this.ade = new PDBAdenine();
@@ -68,7 +69,7 @@ public class PDBAdenosine extends PDBNucleotide
         DrawLine c1ToN9 = new DrawLine(ribo.getC1(), ade.getN9());
         // Connect phosphatgroup and ribose
         DrawLine o5ToP = new DrawLine(ribo.getO5(), pbb.getP());
-        adenosineGrp.getChildren().addAll(c1ToN9.getStructure(), o5ToP.getStructure());
+        adenosineGrp.getChildren().addAll(c1ToN9, o5ToP);
         // Add tooltip
         Tooltip.install(adenosineGrp, new Tooltip("Ade_"+this.getResIndex()));
         return adenosineGrp;
@@ -123,6 +124,10 @@ public class PDBAdenosine extends PDBNucleotide
             case("C6"): ade.setC6(xyz); break;
             case("C8"): ade.setC8(xyz); break;
             case("O2"): ade.setO2(xyz); break;
+            case("H8"): ade.setH8(xyz); break;
+            case("H2"): ade.setH2(xyz); break;
+            case("H61"): ade.setH61(xyz); break;
+            case("H62"): ade.setH62(xyz); break;
 
         }
 

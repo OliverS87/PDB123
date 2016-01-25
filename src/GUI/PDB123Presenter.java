@@ -120,7 +120,7 @@ public class PDB123Presenter {
             // If the current index and the previous one differ by one, connect the both nucleotides
             if (prevIndex == i - 1) {
                 DrawLine backboneConnection = new DrawLine(prev.getThreePrimeEnd(), currentNt.getFivePrimeEnd());
-                structure.getChildren().add(backboneConnection.getStructure());
+                structure.getChildren().add(backboneConnection);
             }
             prevIndex = i;
             prev = currentNt;
