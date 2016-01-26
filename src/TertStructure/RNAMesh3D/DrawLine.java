@@ -1,6 +1,8 @@
 package TertStructure.RNAMesh3D;
 
 import javafx.geometry.Point3D;
+import javafx.scene.paint.Color;
+import javafx.scene.paint.PhongMaterial;
 import javafx.scene.shape.Cylinder;
 import javafx.scene.transform.Rotate;
 import javafx.scene.transform.Translate;
@@ -30,9 +32,32 @@ public class DrawLine extends Cylinder
         this.radius=radius;
         createLine();
     }
+    public DrawLine(Point3D start, Point3D end, double radius, Color col1)
+    {
+        this.start=start;
+        this.end=end;
+        this.radius=radius;
+        this.setMaterial(new PhongMaterial(col1));
+        createLine();
+    }
+    public DrawLine(Point3D start, Point3D end, Color col1)
+    {
+        this.start=start;
+        this.end=end;
+        this.radius=0.04;
+        this.setMaterial(new PhongMaterial(col1));
+        createLine();
+    }
+
     private void createLine()
     {
 
+        // If start and/or end are not set, do not proceed
+        if(start==null || end ==null)
+        {
+            this.setVisible(false);
+            return;
+        }
         // New Cylinder line is centered at origin, pointing into Y-direction
         //Cylinder line = new Cylinder();
         // (1.) Move line to midpoint between start and end

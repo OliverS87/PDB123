@@ -9,6 +9,7 @@ import javafx.scene.shape.Sphere;
  * Created by oliver on 25.01.16.
  */
 public class DrawHydrogen extends Sphere {
+    private static double ATOMRADIUS = 0.53;
     public DrawHydrogen(Point3D hydrogenXYZ){
         // if coordinate is not defined
         // do not show hydrogen
@@ -18,7 +19,7 @@ public class DrawHydrogen extends Sphere {
         }
         else
         {
-            this.setRadius(0.1);
+            this.setRadius(ATOMRADIUS/2);
             this.setTranslateX(hydrogenXYZ.getX());
             this.setTranslateY(hydrogenXYZ.getY());
             this.setTranslateZ(hydrogenXYZ.getZ());

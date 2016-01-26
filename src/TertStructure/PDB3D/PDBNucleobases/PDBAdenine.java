@@ -15,10 +15,22 @@ import TertStructure.RNAMesh3D.DrawPurin;
 public class PDBAdenine extends PDBPurin
 {
 
-    private Point3D N6, O2, H2, H61, H62;
+    private Point3D N6, H2, H61, H62;
 
     public Point3D getN6() {
         return N6;
+    }
+
+    public Point3D getH2() {
+        return H2;
+    }
+
+    public Point3D getH61() {
+        return H61;
+    }
+
+    public Point3D getH62() {
+        return H62;
     }
 
     public void setN6(Point3D n6) {
@@ -37,13 +49,6 @@ public class PDBAdenine extends PDBPurin
         H62 = h62;
     }
 
-    public Point3D getO2() {
-        return O2;
-    }
-
-    public void setO2(Point3D o2) {
-        O2 = o2;
-    }
 
     public Group getStructure()
     {

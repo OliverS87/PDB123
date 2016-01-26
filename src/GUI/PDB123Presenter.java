@@ -1,15 +1,14 @@
 package GUI;
 
 import PDBParser.ReadPDB;
+import SecStructure.DotBracketNotation.DotBracket;
+import TertStructure.Basepairing.HydrogenBondDetector;
 import TertStructure.PDB3D.PDBNucleotide.PDBNucleotide;;
 import TertStructure.RNAMesh3D.DrawLine;
 import javafx.beans.binding.DoubleBinding;
 import javafx.geometry.Point3D;
 import javafx.scene.Group;
 import javafx.scene.PerspectiveCamera;
-import javafx.scene.paint.Color;
-import javafx.scene.paint.PhongMaterial;
-import javafx.scene.shape.Sphere;
 import javafx.scene.transform.Rotate;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
@@ -31,6 +30,10 @@ public class PDB123Presenter {
     private int firstNtIndex, lastNtIndex;
     private Rotate rotateStructureX, rotateStructureY;
     private double mouseXold, mouseXnew, mouseYold, mouseYNew, mouseXDelta, mouseYDelta;
+    private HydrogenBondDetector hbDetector;
+    private PDB123PrintLog printLog;
+    private DotBracket dotBracket;
+    private String dotBracketSeq;
 
     public PDB123Presenter(Stage primaryStage) {
         // Initialize class variables
@@ -50,7 +53,10 @@ public class PDB123Presenter {
     private void initClassVariables(Stage primaryStage) {
         this.stage = primaryStage;
         PDB123View = new PDB123View(primaryStage);
-        this.pdbReader = new ReadPDB();
+        this.printLog = new PDB123PrintLog(PDB123View.getLog());
+        this.pdbReader = new ReadPDB(this.printLog);
+        this.hbDetector = new HydrogenBondDetector(printLog);
+        this.dotBracket = new DotBracket(printLog);
     }
 
     // Menu -> exit
@@ -58,10 +64,6 @@ public class PDB123Presenter {
         PDB123View.getMenuItemExit().setOnAction(event -> System.exit(0));
     }
 
-    // Print a text on the log/msg textarea
-    private void printLogMessage(String msg) {
-        PDB123View.getLog().appendText(msg + "\n");
-    }
 
     // Menu -> Load file
     private void loadFileFunction() {
@@ -73,11 +75,11 @@ public class PDB123Presenter {
             try {
                 path = showFileChooser();
             } catch (Exception e) {
-                printLogMessage("No file loaded");
+                printLog.printLogMessage("No file loaded");
             }
             if (path == null) return;
             String fileName = path.substring(Math.max(path.lastIndexOf('/'), path.lastIndexOf('\\')) + 1);
-            printLogMessage("File loaded " + fileName);
+            printLog.printLogMessage("File loaded " + fileName);
             // Try to parse PDB file
             try {
                 pdbReader.setFilePath(path);
@@ -90,7 +92,7 @@ public class PDB123Presenter {
                 // Future: Can be changed by the user
                 update3DStructure("resType");
             } catch (IOException e) {
-                printLogMessage(e.getMessage());
+                printLog.printLogMessage(e.getMessage());
             }
         });
     }
@@ -125,7 +127,32 @@ public class PDB123Presenter {
             prevIndex = i;
             prev = currentNt;
         }
+        // Identify and visualize hydrogen bonds
+        detectHydrogenBonds();
+        // Calculate dot-bracket notation for current PDB file
+        calculateDotBracketNotation();
 
+
+
+    }
+    private void calculateDotBracketNotation()
+    {
+        // Provide reference to ntMap
+        dotBracket.setNtMap(this.ntMap);
+        // Provide first + last nt indices
+        dotBracket.setFirstNtIndex(this.firstNtIndex);
+        dotBracket.setLastNtIndex(this.lastNtIndex);
+        // Calculate dotBracket notation
+        this.dotBracketSeq = dotBracket.getDotBracket();
+    }
+
+    private void detectHydrogenBonds()
+    {
+        hbDetector.setFirstNtIndex(this.firstNtIndex);
+        hbDetector.setLastNtIndex(this.lastNtIndex);
+        hbDetector.setNtMap(this.ntMap);
+        Group hydrogenBonds = hbDetector.getHDB();
+        PDB123View.getThreeDrawings().getChildren().add(hydrogenBonds);
 
     }
 

@@ -1,11 +1,8 @@
 package TertStructure.PDB3D.PDBNucleobases;
 
-import TertStructure.RNAMesh3D.DrawHydrogen;
-import TertStructure.RNAMesh3D.DrawLine;
-import TertStructure.RNAMesh3D.DrawNitrogen;
+import TertStructure.RNAMesh3D.*;
 import javafx.geometry.Point3D;
 import javafx.scene.Group;
-import TertStructure.RNAMesh3D.DrawPurin;
 
 /**
  * Created by oliver on 14.12.15.
@@ -13,7 +10,27 @@ import TertStructure.RNAMesh3D.DrawPurin;
  * Returns 3D structure.
  */
 public class PDBGuanine extends PDBPurin {
-     private Point3D O2, O6, H1, H21, H22, N2;
+     private Point3D  O6, H1, H21, H22, N2;
+
+    public Point3D getO6() {
+        return O6;
+    }
+
+    public Point3D getH1() {
+        return H1;
+    }
+
+    public Point3D getN2() {
+        return N2;
+    }
+
+    public Point3D getH21() {
+        return H21;
+    }
+
+    public Point3D getH22() {
+        return H22;
+    }
 
     public void setO6(Point3D o6) {
         O6 = o6;
@@ -35,13 +52,7 @@ public class PDBGuanine extends PDBPurin {
         N2 = n2;
     }
 
-    public Point3D getO2() {
-        return O2;
-    }
 
-    public void setO2(Point3D o2) {
-        O2 = o2;
-    }
     public Group getStructure(){
         Group guanineGrp = new Group();
         // Draw Purin ring
@@ -53,14 +64,16 @@ public class PDBGuanine extends PDBPurin {
         DrawHydrogen h22 = new DrawHydrogen(H22);
         DrawHydrogen h8 = new DrawHydrogen(this.getH8());
         DrawNitrogen n2 = new DrawNitrogen(N2);
+        DrawOxygen o6 = new DrawOxygen(O6);
         // Draw bondings between hydrogens, functional groups and the purin ring
         DrawLine h1n1 = new DrawLine(H1, this.getN1());
         DrawLine h21n2 = new DrawLine(H21, N2);
         DrawLine h22n2 = new DrawLine(H22, N2);
         DrawLine n2c2 = new DrawLine(N2, this.getC2());
         DrawLine h8c8 = new DrawLine(this.getH8(), this.getC8());
-        guanineGrp.getChildren().addAll(meshV, h1, h21, h22, h8, n2,
-        h1n1, h21n2, h22n2, n2c2, h8c8);
+        DrawLine c6ToO6 = new DrawLine(this.getC6(), O6);
+        guanineGrp.getChildren().addAll(meshV, h1, h21, h22, h8, n2,o6,
+        h1n1, h21n2, h22n2, n2c2, h8c8, c6ToO6);
         return guanineGrp;
     }
 }

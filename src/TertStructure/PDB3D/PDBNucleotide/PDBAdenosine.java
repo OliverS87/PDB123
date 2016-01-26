@@ -1,5 +1,6 @@
 package TertStructure.PDB3D.PDBNucleotide;
 
+import GUI.PDB123PrintLog;
 import javafx.geometry.Point3D;
 import javafx.scene.Group;
 import TertStructure.PDB3D.PDBBackbone.PDBBackbone;
@@ -9,6 +10,9 @@ import TertStructure.RNAMesh3D.DrawLine;
 import javafx.scene.control.Tooltip;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.PhongMaterial;
+
+import java.util.ArrayList;
+import java.util.Collections;
 
 /**
  * Created by oliver on 15.12.15.
@@ -33,10 +37,13 @@ public class PDBAdenosine extends PDBNucleotide
 
 
 
-    public PDBAdenosine() {
+    public PDBAdenosine(PDB123PrintLog log) {
+        super(log);
         this.ribo = new PDBRibose();
         this.ade = new PDBAdenine();
         this.pbb = new PDBBackbone();
+        // Keep track of atoms with undefined coordinates
+        defAtoms = new ArrayList<>(Collections.nCopies(26, false));
     }
 
     public PDBRibose getRibose() {
@@ -63,6 +70,7 @@ public class PDBAdenosine extends PDBNucleotide
     // Return 3D structure. Add connecting lines between individual parts.
     @Override
     public Group getStructure() {
+        if (!this.allAtomsDefined()) printLog.printLogMessage("WARNING: Ade_"+this.getResIndex()+" not completely defined.");
         Group adenosineGrp = new Group();
         adenosineGrp.getChildren().addAll(this.ribo.getStructure(), this.ade.getStructure(), this.pbb.getStructure());
         // Connect ribose and adenine
@@ -101,33 +109,32 @@ public class PDBAdenosine extends PDBNucleotide
         Point3D xyz = new Point3D(x,y,z);
         switch (atom[0])
         {
-            case("P"): pbb.setP(xyz); break;
-            case("OP1"): pbb.setOP1(xyz); break;
-            case("OP2"): pbb.setOP2(xyz); break;
-            case("C1'"): ribo.setC1(xyz);break;
-            case("C2'"): ribo.setC2(xyz);break;
-            case("C3'"): ribo.setC3(xyz);break;
-            case("C4'"): ribo.setC4(xyz);break;
-            case("C5'"): ribo.setC5(xyz);break;
-            case("O2'"): ribo.setO2(xyz);break;
-            case("O3'"): ribo.setO3(xyz);break;
-            case("O4'"): ribo.setO4(xyz);break;
-            case("O5'"): ribo.setO5(xyz);break;
-            case("N1"): ade.setN1(xyz); break;
-            case("N3"): ade.setN3(xyz); break;
-            case("N6"): ade.setN6(xyz); break;
-            case("N7"): ade.setN7(xyz); break;
-            case("N9"): ade.setN9(xyz); break;
-            case("C2"): ade.setC2(xyz); break;
-            case("C4"): ade.setC4(xyz); break;
-            case("C5"): ade.setC5(xyz); break;
-            case("C6"): ade.setC6(xyz); break;
-            case("C8"): ade.setC8(xyz); break;
-            case("O2"): ade.setO2(xyz); break;
-            case("H8"): ade.setH8(xyz); break;
-            case("H2"): ade.setH2(xyz); break;
-            case("H61"): ade.setH61(xyz); break;
-            case("H62"): ade.setH62(xyz); break;
+            case("P"): {pbb.setP(xyz);defAtoms.set(0, true); break;}
+            case("OP1"): {pbb.setOP1(xyz);defAtoms.set(1, true); break;}
+            case("OP2"): {pbb.setOP2(xyz);defAtoms.set(2, true); break;}
+            case("C1'"): {ribo.setC1(xyz);defAtoms.set(3, true); break;}
+            case("C2'"): {ribo.setC2(xyz);defAtoms.set(4, true); break;}
+            case("C3'"): {ribo.setC3(xyz);defAtoms.set(5, true); break;}
+            case("C4'"): {ribo.setC4(xyz);defAtoms.set(6, true); break;}
+            case("C5'"): {ribo.setC5(xyz);defAtoms.set(7, true); break;}
+            case("O2'"): {ribo.setO2(xyz);defAtoms.set(8, true); break;}
+            case("O3'"): {ribo.setO3(xyz);defAtoms.set(9, true); break;}
+            case("O4'"): {ribo.setO4(xyz);defAtoms.set(10, true); break;}
+            case("O5'"): {ribo.setO5(xyz);defAtoms.set(11, true); break;}
+            case("N1"): {ade.setN1(xyz); defAtoms.set(12, true); break;}
+            case("N3"): {ade.setN3(xyz); defAtoms.set(13, true); break;}
+            case("N6"): {ade.setN6(xyz); defAtoms.set(14, true); break;}
+            case("N7"): {ade.setN7(xyz); defAtoms.set(15, true); break;}
+            case("N9"): {ade.setN9(xyz); defAtoms.set(16, true); break;}
+            case("C2"): {ade.setC2(xyz); defAtoms.set(17, true); break;}
+            case("C4"): {ade.setC4(xyz); defAtoms.set(18, true); break;}
+            case("C5"): {ade.setC5(xyz); defAtoms.set(19, true); break;}
+            case("C6"): {ade.setC6(xyz); defAtoms.set(20, true); break;}
+            case("C8"): {ade.setC8(xyz); defAtoms.set(21, true); break;}
+            case("H8"): {ade.setH8(xyz); defAtoms.set(22, true); break;}
+            case("H2"): {ade.setH2(xyz); defAtoms.set(23, true); break;}
+            case("H61"): {ade.setH61(xyz); defAtoms.set(24, true); break;}
+            case("H62"): {ade.setH62(xyz); defAtoms.set(25, true); break;}
 
         }
 
@@ -136,5 +143,12 @@ public class PDBAdenosine extends PDBNucleotide
     @Override
     public String getType() {
         return "Adenosine";
+    }
+
+    @Override
+    // Return a central coordinate
+    // Needed to estimate the distance to other nucleotides
+    public Point3D getCentralCoordinate() {
+        return ade.getC6().midpoint(ade.getN3());
     }
 }

@@ -11,6 +11,7 @@ import javafx.scene.shape.Sphere;
  */
 public class DrawOxygen extends Sphere
 {
+    private static  double ATOMRADIUS = 0.48;
     public DrawOxygen(Point3D oxyCoordinates)
     {
         // Do not show oxygen if coordinate is undefined
@@ -22,6 +23,6 @@ public class DrawOxygen extends Sphere
         this.setTranslateY(oxyCoordinates.getY());
         this.setTranslateZ(oxyCoordinates.getZ());
         this.setMaterial(new PhongMaterial(Color.RED));
-        this.setRadius(0.35/2);
+        this.setRadius(ATOMRADIUS/2);
     }}
 }

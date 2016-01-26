@@ -10,13 +10,14 @@ import javafx.scene.shape.Sphere;
  * Simple representation of a phosphate atom
  */
 public class DrawPhosphat extends Sphere {
+    private static  double ATOMRADIUS = 0.98;
     public DrawPhosphat(Point3D phosphatCoordinates){
         // Do not show phosphate if coordinates are undefined
         if (phosphatCoordinates == null){
             this.setVisible(false);
         }
         else{
-        this.setRadius(0.35);
+        this.setRadius(ATOMRADIUS/2);
         this.setTranslateX(phosphatCoordinates.getX());
         this.setTranslateY(phosphatCoordinates.getY());
         this.setTranslateZ(phosphatCoordinates.getZ());
