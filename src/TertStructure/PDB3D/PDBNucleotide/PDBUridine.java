@@ -144,7 +144,7 @@ public class PDBUridine extends PDBNucleotide
 
     @Override
     public String getType() {
-        return "Uridine";
+        return "U";
     }
     @Override
     // Return a central coordinate

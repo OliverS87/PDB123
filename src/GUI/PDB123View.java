@@ -142,4 +142,16 @@ public class PDB123View extends VBox {
     SubScene get3DSubScene() {
         return subScene3D;
     }
+
+     SubScene getSubScene2D() {
+        return subScene2D;
+    }
+
+     Group getSecDrawings() {
+        return secDrawings;
+    }
+
+    TextArea getPrimStructure() {
+        return primStructure;
+    }
 }

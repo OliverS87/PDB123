@@ -78,10 +78,10 @@ public class HydrogenBondDetector {
         // or null.
         Group ntPairHDB = new Group();
         switch (ntPair){
-            case("Uridine_Adenosine"): return makeAdenineUracileBasepair((PDBAdenosine) nt2, (PDBUridine) nt1);
-            case("Adenosine_Uridine"): return makeAdenineUracileBasepair((PDBAdenosine) nt1, (PDBUridine) nt2);
-            case("Guanosine_Cytidine"): return makeCytosineGuanineBasepair((PDBCytidine)nt2, (PDBGuanosine) nt1);
-            case("Cytidine_Guanosine"): return makeCytosineGuanineBasepair((PDBCytidine)nt1, (PDBGuanosine) nt2);
+            case("U_A"): return makeAdenineUracileBasepair((PDBAdenosine) nt2, (PDBUridine) nt1);
+            case("A_U"): return makeAdenineUracileBasepair((PDBAdenosine) nt1, (PDBUridine) nt2);
+            case("G_C"): return makeCytosineGuanineBasepair((PDBCytidine)nt2, (PDBGuanosine) nt1);
+            case("C_G"): return makeCytosineGuanineBasepair((PDBCytidine)nt1, (PDBGuanosine) nt2);
         }
         // If nucleotide pair is not ura/ade or gua/cyt return null
         return null;

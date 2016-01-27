@@ -150,7 +150,7 @@ public class PDBGuanosine extends PDBNucleotide
 
     @Override
     public String getType() {
-        return "Guanosine";
+        return "G";
     }
     @Override
     // Return a central coordinate

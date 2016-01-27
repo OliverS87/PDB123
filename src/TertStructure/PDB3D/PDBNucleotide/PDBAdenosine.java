@@ -142,7 +142,7 @@ public class PDBAdenosine extends PDBNucleotide
 
     @Override
     public String getType() {
-        return "Adenosine";
+        return "A";
     }
 
     @Override

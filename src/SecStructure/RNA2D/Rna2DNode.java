@@ -21,7 +21,7 @@ public class Rna2DNode extends Circle
     public Rna2DNode(Double posX, Double posY, double radius, int nodeNr) {
         this.posX.setValue(posX);
         this.posY.setValue(posY);
-        //this.setRadius(radius);
+        this.setRadius(radius);
         this.radiusProperty().setValue(radius);
         this.centerXProperty().bind(this.posX);
         this.centerYProperty().bind(this.posY);

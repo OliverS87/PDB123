@@ -139,6 +139,19 @@ public class SpringEmbedder {
         double cyMin=Double.MAX_VALUE;
         double cyMax=Double.MIN_VALUE;
 
+        // Check if coordinates should be rotated
+        double xyRatio =((yMax-yMin)/(xMax-xMin))/((cyMax-cyMin)/(cxMax-cxMin));
+        if (xyRatio < 1)
+        {
+            for (double[] coordinate: coordinates)
+            {
+                double oldX = coordinate[0];
+                double oldY = coordinate[1];
+                coordinate[0] = oldY;
+                coordinate[1] = oldX;
+            }
+        }
+
         for (double[] apt : coordinates) {
             cxMin = Math.min(cxMin, apt[0]);
             cxMax = Math.max(cxMax, apt[0]);

@@ -1,7 +1,9 @@
 package GUI;
 
 import PDBParser.ReadPDB;
+import PrimStructure.ParseSequence;
 import SecStructure.DotBracketNotation.DotBracket;
+import SecStructure.RNA2D.Rna2DGraph;
 import TertStructure.Basepairing.HydrogenBondDetector;
 import TertStructure.PDB3D.PDBNucleotide.PDBNucleotide;;
 import TertStructure.RNAMesh3D.DrawLine;
@@ -26,6 +28,7 @@ public class PDB123Presenter {
     private GUI.PDB123View PDB123View;
     private Stage stage;
     private ReadPDB pdbReader;
+    private Rna2DGraph Graph2D;
     private Map<Integer, PDBNucleotide> ntMap;
     private int firstNtIndex, lastNtIndex;
     private Rotate rotateStructureX, rotateStructureY;
@@ -33,7 +36,8 @@ public class PDB123Presenter {
     private HydrogenBondDetector hbDetector;
     private PDB123PrintLog printLog;
     private DotBracket dotBracket;
-    private String dotBracketSeq;
+    private String dotBracketSeq, rnaSeq;
+    private ParseSequence parseSeq;
 
     public PDB123Presenter(Stage primaryStage) {
         // Initialize class variables
@@ -41,11 +45,12 @@ public class PDB123Presenter {
         // Add functionality to menubar elements
         exitFunction();
         loadFileFunction();
-        // Set camera perspective
-        setPerspective();
-        // Set Mouse actions
-        setMouseActions();
-
+        // Set 3D camera perspective
+        setPerspective3D();
+        // Set 3D subscene Mouse actions
+        setMouseActions3D();
+        // Set 2D subscene Mouse actions
+        setMouseActions2D();
 
     }
 
@@ -57,6 +62,7 @@ public class PDB123Presenter {
         this.pdbReader = new ReadPDB(this.printLog);
         this.hbDetector = new HydrogenBondDetector(printLog);
         this.dotBracket = new DotBracket(printLog);
+        this.parseSeq = new ParseSequence();
     }
 
     // Menu -> exit
@@ -87,7 +93,7 @@ public class PDB123Presenter {
                 firstNtIndex = pdbReader.getFirstNtIndex();
                 lastNtIndex = pdbReader.getLastNtIndex();
                 // Recenter camera
-                centerCam();
+                centerCam3D();
                 // Colormode is fixed to residue type
                 // Future: Can be changed by the user
                 update3DStructure("resType");
@@ -102,7 +108,6 @@ public class PDB123Presenter {
     // so that they are shown in the subscene
     // The order of the nucleotides in the PDB file is irrelevant
     private void update3DStructure(String colorMode) {
-
         Group structure = PDB123View.getThreeDrawings();
         // Clear previous structures
         structure.getChildren().clear();
@@ -131,7 +136,13 @@ public class PDB123Presenter {
         detectHydrogenBonds();
         // Calculate dot-bracket notation for current PDB file
         calculateDotBracketNotation();
-
+        // Once 3D structure preparation is finished,
+        // Produce 1D structure presentation
+        rnaSeq = parseSeq.parseRnaSeq(ntMap, firstNtIndex, lastNtIndex);
+        PDB123View.getPrimStructure().setText(rnaSeq);
+        // produce 2D structure presentation
+        Graph2D = new Rna2DGraph(this.getPDB123View().getSecDrawings(), this.getPDB123View().getSubScene2D(), dotBracketSeq, rnaSeq, printLog );
+        Graph2D.getRna2D();
 
 
     }
@@ -157,7 +168,7 @@ public class PDB123Presenter {
     }
 
     // Reset camera + rotation to originals tate
-    private void centerCam() {
+    private void centerCam3D() {
         PerspectiveCamera cam = PDB123View.get3DCamera();
         cam.setTranslateX(0);
         cam.setTranslateY(0);
@@ -168,7 +179,7 @@ public class PDB123Presenter {
     }
 
     // Set camera settings and rotation of Group structure
-    private void setPerspective() {
+    private void setPerspective3D() {
         PerspectiveCamera cam = PDB123View.get3DCamera();
         cam.setNearClip(0.0000001);
         cam.setFarClip(-100000.0);
@@ -187,7 +198,7 @@ public class PDB123Presenter {
 
     }
 
-    private void setMouseActions() {
+    private void setMouseActions3D() {
         PerspectiveCamera cam = PDB123View.get3DCamera();
         // Save initial mouseX/Y
         PDB123View.get3DSubScene().setOnMousePressed(event -> {
@@ -214,6 +225,41 @@ public class PDB123Presenter {
             if (!event.isShiftDown() && !event.isControlDown()) {
                 rotateStructureY.setAngle(rotateStructureY.getAngle() + mouseXDelta * 0.2);
                 rotateStructureX.setAngle(rotateStructureX.getAngle() - mouseYDelta * 0.2);
+            }
+
+        });
+
+    }
+
+    private void setMouseActions2D() {
+
+        Group root2D = PDB123View.getSecDrawings();
+        // Save initial mouseX/Y
+        PDB123View.getSubScene2D().setOnMousePressed(event -> {
+            mouseXold = mouseXnew = event.getX();
+            mouseYold = mouseYNew = event.getY();
+            mouseXDelta = 0;
+            mouseYDelta = 0;
+        });
+        // Transformations depend directly on mouseXYZ delta
+        PDB123View.getSubScene2D().setOnMouseDragged(event -> {
+            mouseXold = mouseXnew;
+            mouseYold = mouseYNew;
+            mouseXnew = event.getX();
+            mouseYNew = event.getY();
+            mouseXDelta = mouseXnew - mouseXold;
+            mouseYDelta = mouseYNew - mouseYold;
+            if (event.isShiftDown()) {
+                root2D.setScaleX(root2D.getScaleX() + mouseYDelta*0.4);
+                root2D.setScaleY(root2D.getScaleY()+mouseYDelta*0.4);
+            }
+            if (event.isControlDown()) {
+                root2D.setTranslateX(root2D.getTranslateX()+mouseXDelta*0.2);
+                root2D.setTranslateY(root2D.getTranslateY()+mouseYDelta*0.2);
+
+            }
+            if (!event.isShiftDown() && ! event.isControlDown()){
+                root2D.setRotate(root2D.getRotate()+mouseXDelta*-0.2);
             }
 
         });

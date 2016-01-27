@@ -146,7 +146,7 @@ public class PDBCytidine extends PDBNucleotide
 
     @Override
     public String getType() {
-        return "Cytidine";
+        return "C";
     }
     @Override
     // Return a central coordinate
