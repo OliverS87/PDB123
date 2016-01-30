@@ -1,6 +1,7 @@
 package TertStructure.PDB3D.PDBNucleotide;
 
 import GUI.PDB123PrintLog;
+import javafx.beans.property.BooleanProperty;
 import javafx.geometry.Point3D;
 import javafx.scene.Group;
 import TertStructure.PDB3D.PDBBackbone.PDBBackbone;
@@ -106,18 +107,33 @@ public class PDBUridine extends PDBNucleotide
 
     // Return 3D structure. Add connecting lines between individual parts.
     @Override
-    public Group getStructure() {
+    public Group getStructure(BooleanProperty showBackbone, BooleanProperty showSugar, BooleanProperty showBase) {
         if (!this.allAtomsDefined()) printLog.printLogMessage("WARNING: Uri_"+this.getResIndex()+" not completely defined.");
         Group uridineGrp = new Group();
+        Group uridineSugar = this.ribo.getStructure();
+        uridineSugar.visibleProperty().bind(showSugar);
+        Group uridineNucleobase =this.uri.getStructure();
+        uridineNucleobase.visibleProperty().bind(showBase);
+        Group uridinePBB = this.pbb.getStructure();
+        uridinePBB.visibleProperty().bind(showBackbone);
         uridineGrp.getChildren().addAll(
-                this.ribo.getStructure(),
-                this.uri.getStructure(),
-                this.pbb.getStructure()
+                uridineSugar,
+                uridineNucleobase,
+                uridinePBB
                 );
         // Connect ribose and uracil
         DrawLine c1toN1 = new DrawLine(ribo.getC1(), uri.getN1());
+        c1toN1.visibleProperty().bind(showSugar.and(showBase));
+        // Connect ribose and phosphat
+        // Check if phosphat is present (might not be available in first residue of chain)
+        if (pbb.getP() == null)
+        {
+            uridineGrp.getChildren().addAll(c1toN1);
+            return uridineGrp;
+        }
         // Connect ribose and phosphate
         DrawLine o5ToP = new DrawLine(ribo.getO5(), pbb.getP());
+        o5ToP.visibleProperty().bind(showSugar.and(showBackbone));
         uridineGrp.getChildren().addAll(c1toN1, o5ToP);
         // Add tooltip
         Tooltip.install(uridineGrp, new Tooltip("Uri_"+this.getResIndex()));

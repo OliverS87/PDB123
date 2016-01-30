@@ -1,6 +1,7 @@
 package TertStructure.PDB3D.PDBNucleotide;
 
 import GUI.PDB123PrintLog;
+import javafx.beans.property.BooleanProperty;
 import javafx.geometry.Point3D;
 import javafx.scene.Group;
 import TertStructure.PDB3D.PDBBackbone.PDBBackbone;
@@ -109,21 +110,32 @@ public class PDBGuanosine extends PDBNucleotide
     }
 
     // Return 3D structure. Add connecting lines between individual parts.
+    // Visibility of components can be activated/deactivated by user
     @Override
-    public Group getStructure() {
+    public Group getStructure(BooleanProperty showBackbone, BooleanProperty showSugar, BooleanProperty showBase) {
         if (!this.allAtomsDefined()) printLog.printLogMessage("WARNING: Gua_"+this.getResIndex()+" not completely defined.");
         Group guanosineGrp = new Group();
-        guanosineGrp.getChildren().addAll(this.ribo.getStructure(), this.gua.getStructure(), this.pbb.getStructure());
+        // Build structure for ribose, nucleobase and phosphat backbone
+        // Bind visibility of components to showBackbone/showSugar/showBase
+        Group guanosineSugar = this.ribo.getStructure();
+        guanosineSugar.visibleProperty().bind(showSugar);
+        Group guanosineBase = this.gua.getStructure();
+        guanosineBase.visibleProperty().bind(showBase);
+        Group guanosinePBB = this.pbb.getStructure();
+        guanosinePBB.visibleProperty().bind(showBackbone);
+        guanosineGrp.getChildren().addAll(guanosineSugar, guanosineBase, guanosinePBB);
         // Connect ribose and guanine
         DrawLine c1ToN9 = new DrawLine(ribo.getC1(), gua.getN9());
+        c1ToN9.visibleProperty().bind(showSugar.and(showBase));
         // Connect ribose and phosphat
-        // Check if phosphat is present (not available in first residue of chain)
+        // Check if phosphat is present (might not be available in first residue of chain)
         if (pbb.getP() == null)
         {
             guanosineGrp.getChildren().addAll(c1ToN9);
             return guanosineGrp;
         }
         DrawLine o5ToP = new DrawLine(ribo.getO5(), pbb.getP());
+        o5ToP.visibleProperty().bind(showSugar.and(showBackbone));
         guanosineGrp.getChildren().addAll(c1ToN9, o5ToP);
         // Add tooltip
         Tooltip.install(guanosineGrp, new Tooltip("Gua_"+this.getResIndex()));

@@ -3,6 +3,7 @@ package GUI;
 import javafx.beans.binding.DoubleBinding;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.Group;
 import javafx.scene.PerspectiveCamera;
 import javafx.scene.SceneAntialiasing;
@@ -31,6 +32,8 @@ public class PDB123View extends VBox {
     private MenuItem menuItemClear;
     // Subscenes for 1.-3. structure + log/msg window
     private SubScene subScene1D, subScene2D, subScene3D, subSceneLog;
+    private StackPane stack3D, stack2D;
+    private BorderPane topPane3D, topPane2D;
     // Camera
     private PerspectiveCamera camera;
     // Container for 3D and 2D elements
@@ -39,6 +42,12 @@ public class PDB123View extends VBox {
     // HBoxes for horizontal placement of subscenes
     private HBox subScene1D2D;
     private HBox subScenelog3D;
+    // HBoxes for 3D and 2D control
+    private HBox controls3D, controls2D;
+    // Buttons for re-centering
+    private Button center3D, center2D;
+    // Checkboxes to add/remove drawings of 3D or 2D components
+    CheckBox cBsugar3D, cBnucleoBase3D, cBpBB3D, cBnodes2D, cBedges2D;
 
 
     public PDB123View(Stage primaryStage) {
@@ -62,17 +71,61 @@ public class PDB123View extends VBox {
         subScene1D = new SubScene(primStructure, 0, 0);
         subScene2D = new SubScene(secDrawings, 0, 0);
         subScene3D = new SubScene(threeDrawings, 0, 0, true, SceneAntialiasing.BALANCED);
+        stack3D = new StackPane();
+        stack2D = new StackPane();
+        topPane3D = new BorderPane();
+        topPane2D = new BorderPane();
         camera = new PerspectiveCamera(false);
         subScene3D.setCamera(camera);
         subSceneLog = new SubScene(log, 0, 0);
+        // Buttons for 2D/3D re-centering
+        center3D = new Button("Center");
+        center2D = new Button("Center");
+        // Checkboxes to select components to display
+        cBsugar3D = new CheckBox("Ribose");
+        cBnucleoBase3D = new CheckBox("Nucleobase");
+        cBpBB3D = new CheckBox("Backbone");
+        cBnodes2D = new CheckBox("Show nodes");
+        cBedges2D = new CheckBox("Show edges");
+        // Hboxes for 3D and 2D controls
+        controls2D = new HBox();
+        controls3D = new HBox();
     }
 
     // Set layout elements and positioning
     private void setLayout(Stage primaryStage) {
+        // Stack subScene3D and topPane3D
+        stack3D.setAlignment(Pos.CENTER);
+        topPane3D.setPickOnBounds(false);
+        stack3D.setPickOnBounds(false);
+        subScene3D.setPickOnBounds(true);
+        controls3D.getChildren().addAll(center3D, cBnucleoBase3D, cBsugar3D, cBpBB3D);
+        controls3D.setSpacing(5);
+        controls3D.setPadding(new Insets(5));
+        controls3D.setAlignment(Pos.CENTER_RIGHT);
+        topPane3D.setBottom(controls3D);
+        center3D.getStyleClass().add("buttonCenter");
+        topPane3D.setPadding(new Insets(10));
+        stack3D.getChildren().addAll(subScene3D, topPane3D);
+        // Stack subScene2D and topPane2D
+        stack2D.setAlignment(Pos.CENTER);
+        topPane2D.setPickOnBounds(false);
+        stack2D.setPickOnBounds(false);
+        subScene2D.setPickOnBounds(true);
+        controls2D.getChildren().addAll(center2D, cBnodes2D, cBedges2D);
+        controls2D.setSpacing(5);
+        controls2D.setPadding(new Insets(5));
+        controls2D.setAlignment(Pos.CENTER_RIGHT);
+        topPane2D.setBottom(controls2D);
+        center2D.getStyleClass().add("buttonCenter");
+        topPane2D.setPadding(new Insets(10));
+        topPane2D.setPickOnBounds(false);
+        stack2D.getChildren().addAll(subScene2D, topPane2D);
         // Add HBoxes to View and add subscenes to HBoxes
+
         this.getChildren().addAll(subScene1D2D, subScenelog3D);
-        subScene1D2D.getChildren().addAll(subScene1D, subScene2D);
-        subScenelog3D.getChildren().addAll(subSceneLog, subScene3D);
+        subScene1D2D.getChildren().addAll(subScene1D, stack2D);
+        subScenelog3D.getChildren().addAll(subSceneLog, stack3D);
         // Resize subscenes upon stage size change
         DoubleBinding primaryStageHeight = this.heightProperty().multiply(0.85);
         DoubleBinding primaryStageWidth = this.widthProperty().multiply(0.95);
@@ -86,8 +139,8 @@ public class PDB123View extends VBox {
         subScene3D.widthProperty().bind(primaryStageWidth.multiply(2. / 3));
         // Set subscene background colors
         subScene1D.setFill(Color.BLACK);
-        subScene2D.setFill(Color.LIGHTGRAY);
-        subScene3D.setFill(Color.LIGHTGREY);
+       // subScene2D.setFill(Color.TRANSPARENT);
+        //subScene3D.setFill(Color.TRANSPARENT);
         subSceneLog.setFill(Color.CHOCOLATE);
         // Spacing between subscenes
         this.setSpacing(5);
@@ -153,5 +206,33 @@ public class PDB123View extends VBox {
 
     TextArea getPrimStructure() {
         return primStructure;
+    }
+
+     CheckBox getcBsugar3D() {
+        return cBsugar3D;
+    }
+
+     CheckBox getcBnucleoBase3D() {
+        return cBnucleoBase3D;
+    }
+
+     CheckBox getcBpBB3D() {
+        return cBpBB3D;
+    }
+
+     CheckBox getcBnodes2D() {
+        return cBnodes2D;
+    }
+
+     CheckBox getcBedges2D() {
+        return cBedges2D;
+    }
+
+    Button getCenter2D() {
+        return center2D;
+    }
+
+    Button getCenter3D() {
+        return center3D;
     }
 }

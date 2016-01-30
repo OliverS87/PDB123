@@ -1,6 +1,7 @@
 package TertStructure.PDB3D.PDBNucleotide;
 
 import GUI.PDB123PrintLog;
+import javafx.beans.property.BooleanProperty;
 import javafx.geometry.Point3D;
 import javafx.scene.Group;
 import TertStructure.PDB3D.PDBBackbone.PDBBackbone;
@@ -57,18 +58,36 @@ public class PDBCytidine extends PDBNucleotide
     }
 
     // Return 3D structure. Add connecting lines between individual parts.
+    // Visibility of components can be activated/deactivated by user
     @Override
-    public Group getStructure() {
+    public Group getStructure(BooleanProperty showBackbone, BooleanProperty showSugar, BooleanProperty showBase) {
         if (!this.allAtomsDefined()) printLog.printLogMessage("WARNING: Cyt_"+this.getResIndex()+" not completely defined.");
         Group cytidineGrp = new Group();
+        // Build structure for ribose, nucleobase and phosphat backbone
+        // Bind visibility of components to showBackbone/showSugar/showBase
+        Group cytidineRibose = this.ribo.getStructure();
+        cytidineRibose.visibleProperty().bind(showSugar);
+        Group cytidineNucleobase = this.cyt.getStructure();
+        cytidineNucleobase.visibleProperty().bind(showBase);
+        Group cytidinePBB = this.pbb.getStructure();
+        cytidinePBB.visibleProperty().bind(showBackbone);
         cytidineGrp.getChildren().addAll(
-                this.ribo.getStructure(),
-                this.cyt.getStructure(),
-                this.pbb.getStructure());
+                cytidineRibose,
+                cytidineNucleobase,
+                cytidinePBB);
         // Connect ribose and cytosine
         DrawLine c1toN1 = new DrawLine(ribo.getC1(), cyt.getN1());
+        c1toN1.visibleProperty().bind(showSugar.and(showBase));
+        // Connect ribose and phosphat
+        // Check if phosphat is present (might not be available in first residue of chain)
+        if (pbb.getP() == null)
+        {
+            cytidineGrp.getChildren().addAll(c1toN1);
+            return cytidineGrp;
+        }
         // Connect ribose and phosphat
         DrawLine o5ToP = new DrawLine(ribo.getO5(), pbb.getP());
+        o5ToP.visibleProperty().bind(showSugar.and(showBackbone));
         cytidineGrp.getChildren().addAll(c1toN1, o5ToP);
         // Add tooltip
         Tooltip.install(cytidineGrp, new Tooltip("Cyt_"+this.getResIndex()));

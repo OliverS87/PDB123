@@ -1,6 +1,7 @@
 package TertStructure.PDB3D.PDBNucleotide;
 
 import GUI.PDB123PrintLog;
+import javafx.beans.property.BooleanProperty;
 import javafx.geometry.Point3D;
 import javafx.scene.Group;
 import TertStructure.PDB3D.PDBBackbone.PDBBackbone;
@@ -68,15 +69,33 @@ public class PDBAdenosine extends PDBNucleotide
     }
 
     // Return 3D structure. Add connecting lines between individual parts.
+    // Visibility of components can be activated/deactivated by user
     @Override
-    public Group getStructure() {
+    public Group getStructure(BooleanProperty showBackbone, BooleanProperty showSugar, BooleanProperty showBase) {
         if (!this.allAtomsDefined()) printLog.printLogMessage("WARNING: Ade_"+this.getResIndex()+" not completely defined.");
         Group adenosineGrp = new Group();
-        adenosineGrp.getChildren().addAll(this.ribo.getStructure(), this.ade.getStructure(), this.pbb.getStructure());
+        // Build structure for ribose, nucleobase and phosphat backbone
+        // Bind visibility of components to showBackbone/showSugar/showBase
+        Group adenosineRibose = this.ribo.getStructure();
+        adenosineRibose.visibleProperty().bind(showSugar);
+        Group adenosineNucleoBase = this.ade.getStructure();
+        adenosineNucleoBase.visibleProperty().bind(showBase);
+        Group adenosinePPB = this.pbb.getStructure();
+        adenosinePPB.visibleProperty().bind(showBackbone);
+        adenosineGrp.getChildren().addAll(adenosineRibose, adenosineNucleoBase, adenosinePPB);
         // Connect ribose and adenine
         DrawLine c1ToN9 = new DrawLine(ribo.getC1(), ade.getN9());
+        c1ToN9.visibleProperty().bind(showSugar.and(showBase));
+        // Connect ribose and phosphat
+        // Check if phosphat is present (might not be available in first residue of chain)
+        if (pbb.getP() == null)
+        {
+            adenosineGrp.getChildren().addAll(c1ToN9);
+            return adenosineGrp;
+        }
         // Connect phosphatgroup and ribose
         DrawLine o5ToP = new DrawLine(ribo.getO5(), pbb.getP());
+        o5ToP.visibleProperty().bind(showBackbone.and(showSugar));
         adenosineGrp.getChildren().addAll(c1ToN9, o5ToP);
         // Add tooltip
         Tooltip.install(adenosineGrp, new Tooltip("Ade_"+this.getResIndex()));
