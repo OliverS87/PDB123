@@ -42,6 +42,7 @@ public class PDBUridine extends PDBNucleotide
         this.uri = new PDBUracil();
         this.pbb = new PDBBackbone();
         defAtoms = new ArrayList<>(Collections.nCopies(23, false));
+        isSelectedListener();
     }
 
     public PDBRibose getRibose() {
@@ -105,6 +106,23 @@ public class PDBUridine extends PDBNucleotide
 
     }
 
+
+    // Add listener to react to selection change event
+    private void isSelectedListener()
+    {
+        this.isSelectedProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue)
+            {
+                uri.setNucleobaseColor(new PhongMaterial(Color.HOTPINK.invert()));
+            }
+            else
+            {
+                uri.setNucleobaseColor(new PhongMaterial(Color.HOTPINK));
+            }
+        });
+    }
+
+
     // Return 3D structure. Add connecting lines between individual parts.
     @Override
     public Group getStructure(BooleanProperty showBackbone, BooleanProperty showSugar, BooleanProperty showBase) {
@@ -137,6 +155,8 @@ public class PDBUridine extends PDBNucleotide
         uridineGrp.getChildren().addAll(c1toN1, o5ToP);
         // Add tooltip
         Tooltip.install(uridineGrp, new Tooltip("Uri_"+this.getResIndex()));
+        uridineGrp.setOnMouseClicked(event -> printLog.printLogMessage("Selected: Uri_"+this.getResIndex()));
+        uridineGrp.setPickOnBounds(true);
         return uridineGrp;
     }
 

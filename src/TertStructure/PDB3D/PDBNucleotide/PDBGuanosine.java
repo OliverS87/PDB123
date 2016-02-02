@@ -42,6 +42,7 @@ public class PDBGuanosine extends PDBNucleotide
         this.gua = new PDBGuanine();
         this.pbb = new PDBBackbone();
         defAtoms = new ArrayList<>(Collections.nCopies(27, false));
+        isSelectedListener();
     }
 
     public PDBRibose getRibose() {
@@ -109,6 +110,22 @@ public class PDBGuanosine extends PDBNucleotide
 
     }
 
+
+    // Add listener to react to selection change event
+    private void isSelectedListener()
+    {
+        this.isSelectedProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue)
+            {
+                gua.setNucleobaseColor(new PhongMaterial(Color.CYAN.invert()));
+            }
+            else
+            {
+                gua.setNucleobaseColor(new PhongMaterial(Color.CYAN));
+            }
+        });
+    }
+
     // Return 3D structure. Add connecting lines between individual parts.
     // Visibility of components can be activated/deactivated by user
     @Override
@@ -139,6 +156,7 @@ public class PDBGuanosine extends PDBNucleotide
         guanosineGrp.getChildren().addAll(c1ToN9, o5ToP);
         // Add tooltip
         Tooltip.install(guanosineGrp, new Tooltip("Gua_"+this.getResIndex()));
+        guanosineGrp.setOnMouseClicked(event -> printLog.printLogMessage("Selected: Gua_"+this.getResIndex()));
         return guanosineGrp;
     }
 

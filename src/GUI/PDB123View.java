@@ -11,6 +11,9 @@ import javafx.scene.SubScene;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Line;
+import javafx.scene.text.Text;
+import javafx.scene.text.TextFlow;
 import javafx.stage.Stage;
 
 /**
@@ -20,7 +23,7 @@ import javafx.stage.Stage;
  */
 public class PDB123View extends VBox {
     // Two textareas: Prim. Structure and log/msg output
-    private TextArea primStructure;
+    private TextFlow primStructure;
     private TextArea log;
     // Menubar
     private MenuBar menuBar;
@@ -33,7 +36,8 @@ public class PDB123View extends VBox {
     // Subscenes for 1.-3. structure + log/msg window
     private SubScene subScene1D, subScene2D, subScene3D, subSceneLog;
     private StackPane stack3D, stack2D;
-    private BorderPane topPane3D, topPane2D;
+    private BorderPane topPane2D,topPane3D;
+
     // Camera
     private PerspectiveCamera camera;
     // Container for 3D and 2D elements
@@ -50,6 +54,7 @@ public class PDB123View extends VBox {
     CheckBox cBsugar3D, cBnucleoBase3D, cBpBB3D, cBnodes2D, cBedges2D;
 
 
+
     public PDB123View(Stage primaryStage) {
         // Initialize class variables
         initClassVariables();
@@ -62,7 +67,7 @@ public class PDB123View extends VBox {
 
     // Initialize class variables
     private void initClassVariables() {
-        primStructure = new TextArea("Primary Structure");
+        primStructure = new TextFlow(new Text("Primary Structure"));
         log = new TextArea("Messages\n");
         subScene1D2D = new HBox();
         subScenelog3D = new HBox();
@@ -70,7 +75,7 @@ public class PDB123View extends VBox {
         threeDrawings = new Group();
         subScene1D = new SubScene(primStructure, 0, 0);
         subScene2D = new SubScene(secDrawings, 0, 0);
-        subScene3D = new SubScene(threeDrawings, 0, 0, true, SceneAntialiasing.BALANCED);
+        subScene3D = new SubScene(threeDrawings, 0, 0, true, SceneAntialiasing.DISABLED);
         stack3D = new StackPane();
         stack2D = new StackPane();
         topPane3D = new BorderPane();
@@ -90,6 +95,7 @@ public class PDB123View extends VBox {
         // Hboxes for 3D and 2D controls
         controls2D = new HBox();
         controls3D = new HBox();
+
     }
 
     // Set layout elements and positioning
@@ -119,7 +125,6 @@ public class PDB123View extends VBox {
         topPane2D.setBottom(controls2D);
         center2D.getStyleClass().add("buttonCenter");
         topPane2D.setPadding(new Insets(10));
-        topPane2D.setPickOnBounds(false);
         stack2D.getChildren().addAll(subScene2D, topPane2D);
         // Add HBoxes to View and add subscenes to HBoxes
 
@@ -138,7 +143,6 @@ public class PDB123View extends VBox {
         subScene3D.heightProperty().bind(primaryStageHeight.multiply(2. / 3));
         subScene3D.widthProperty().bind(primaryStageWidth.multiply(2. / 3));
         // Set subscene background colors
-        subScene1D.setFill(Color.BLACK);
        // subScene2D.setFill(Color.TRANSPARENT);
         //subScene3D.setFill(Color.TRANSPARENT);
         subSceneLog.setFill(Color.CHOCOLATE);
@@ -150,6 +154,10 @@ public class PDB123View extends VBox {
         subScene1D2D.setPadding(new Insets(5));
         subScenelog3D.setSpacing(5);
         subScenelog3D.setPadding(new Insets(5));
+        // Set border around 2D and 3D representation
+        topPane2D.getStyleClass().add("subsceneBorder");
+        topPane3D.getStyleClass().add("subsceneBorder");
+        primStructure.getStyleClass().add("textFlowBorder");
     }
 
     // Initialize Menubar
@@ -204,7 +212,7 @@ public class PDB123View extends VBox {
         return secDrawings;
     }
 
-    TextArea getPrimStructure() {
+    TextFlow getPrimStructure() {
         return primStructure;
     }
 
@@ -234,5 +242,9 @@ public class PDB123View extends VBox {
 
     Button getCenter3D() {
         return center3D;
+    }
+
+    public Pane getTopPane3D() {
+        return topPane3D;
     }
 }

@@ -1,7 +1,10 @@
 package TertStructure.PDB3D.PDBNucleotide;
 
 import GUI.PDB123PrintLog;
+import SecStructure.RNA2D.Rna2DNode;
 import TertStructure.PDB3D.PDBSugar.PDBRibose;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.geometry.Point3D;
 import javafx.scene.Group;
 
@@ -15,6 +18,8 @@ import java.util.ArrayList;
  */
 public abstract class PDBNucleotide {
     private int resIndex;
+    private Rna2DNode rna2DNode;
+    private BooleanProperty isSelected = new SimpleBooleanProperty(false);
     PDB123PrintLog printLog;
     // Count number of defined atoms
     ArrayList<Boolean> defAtoms;
@@ -36,7 +41,7 @@ public abstract class PDBNucleotide {
     }
 
     public abstract String getType();
-    public abstract Group getStructure();
+    public abstract Group getStructure(BooleanProperty showBackbone, BooleanProperty showSugar, BooleanProperty showNucleoBase);
     public abstract Point3D getFivePrimeEnd();
     public abstract Point3D getThreePrimeEnd();
     public abstract void setColorMode(String colorMode);
@@ -57,4 +62,10 @@ public abstract class PDBNucleotide {
     public  boolean allAtomsDefined(){
         return !defAtoms.contains(false);
     };
+    public BooleanProperty isSelectedProperty() {return isSelected;}
+    public Rna2DNode getRna2DNode(){return  rna2DNode;}
+
+    public void setRna2DNode(Rna2DNode rna2DNode) {
+        this.rna2DNode = rna2DNode;
+    }
 }

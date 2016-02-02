@@ -1,12 +1,8 @@
 .root{
 -fx-background-color: radial-gradient(center 100% 0%, radius 20%, white, yellow, lightblue);
+
 }
-.subScene2D{
--fx-background-color: radial-gradient(center 100% 0%, radius 20%, white, Grey, Black);
-}
-.subScene3D{
--fx-background-color: radial-gradient(center 100% 0%, radius 20%, white, yellow, Green);
-}
+
 .button {
 -fx-background-color: darkblue;
 -fx-text-fill: white;
@@ -26,6 +22,15 @@
 -fx-background-color: red;
 -fx-text-fill: white;
 }
+.buttonCenter{
+-fx-background-color: darkblue;
+-fx-text-fill: white;
+-fx-font-size: 15px;
+}
+.buttonCenter:hover{
+-fx-background-color: green;
+-fx-font-size: 15px;
+}
 .text-field {
 -fx-font-size: 15px;
 -fx-font-family: courier;
@@ -42,6 +47,15 @@
 
 .label{
 -fx-background-color: transparent;
--fx-text-fill: darkblue;
+-fx-text-fill: black;
 }
 
+.subsceneBorder{
+-fx-border-style: solid;
+-fx-border-color: black;
+}
+.textFlowBorder{
+-fx-border-style: solid;
+-fx-border-color: black;
+-fx-background-color: transparent;
+}

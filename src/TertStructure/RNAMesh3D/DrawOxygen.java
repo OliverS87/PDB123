@@ -24,5 +24,6 @@ public class DrawOxygen extends Sphere
         this.setTranslateZ(oxyCoordinates.getZ());
         this.setMaterial(new PhongMaterial(Color.RED));
         this.setRadius(ATOMRADIUS/2);
+            this.setOnMouseClicked(event -> System.out.println("Oxy click"));
     }}
 }

@@ -45,6 +45,7 @@ public class PDBAdenosine extends PDBNucleotide
         this.pbb = new PDBBackbone();
         // Keep track of atoms with undefined coordinates
         defAtoms = new ArrayList<>(Collections.nCopies(26, false));
+        isSelectedListener();
     }
 
     public PDBRibose getRibose() {
@@ -98,7 +99,7 @@ public class PDBAdenosine extends PDBNucleotide
         o5ToP.visibleProperty().bind(showBackbone.and(showSugar));
         adenosineGrp.getChildren().addAll(c1ToN9, o5ToP);
         // Add tooltip
-        Tooltip.install(adenosineGrp, new Tooltip("Ade_"+this.getResIndex()));
+
         return adenosineGrp;
     }
     // Color purin ring according to colormode
@@ -157,6 +158,20 @@ public class PDBAdenosine extends PDBNucleotide
 
         }
 
+    }
+
+    private void isSelectedListener()
+    {
+        this.isSelectedProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue)
+            {
+                ade.setNucleobaseColor(new PhongMaterial(Color.DARKGREEN.invert()));
+            }
+            else
+            {
+                ade.setNucleobaseColor(new PhongMaterial(Color.DARKGREEN));
+            }
+        });
     }
 
     @Override

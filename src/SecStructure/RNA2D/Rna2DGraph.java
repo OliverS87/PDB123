@@ -3,15 +3,13 @@ package SecStructure.RNA2D;
 import GUI.PDB123PrintLog;
 import SecStructure.GraphCalculator.Graph;
 import SecStructure.GraphCalculator.SpringEmbedder;
+import TertStructure.PDB3D.PDBNucleotide.PDBNucleotide;
 import javafx.scene.Cursor;
 import javafx.scene.Group;
 import javafx.scene.SubScene;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.DoubleSummaryStatistics;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.*;
 
 /**
  * Created by oliver on 26.01.16.
@@ -27,10 +25,11 @@ public class Rna2DGraph {
     private SubScene secSubScene;
     private Graph grp;
     private PDB123PrintLog log;
-    private Timer timer;
-    long lastResizeTime = System.currentTimeMillis();
+    private ArrayList<Rna2DNode> node2DList;
+    private ArrayList<Rna2DEdge> edge2DList;
 
-    public Rna2DGraph(Group secDrawings, SubScene secSubScene, String dotBracketSeq, String rnaSeq, PDB123PrintLog log) {
+
+    public Rna2DGraph(Group secDrawings, SubScene secSubScene, String dotBracketSeq, String rnaSeq, PDB123PrintLog log, ArrayList<Rna2DNode> node2DList, ArrayList<Rna2DEdge> edge2DList) {
         this.root2D = secDrawings;
         this.dotBracketSeq = dotBracketSeq;
         this.secSubScene = secSubScene;
@@ -38,21 +37,33 @@ public class Rna2DGraph {
         this.log = log;
         this.nodes = new ArrayList<>();
         this.grp = new Graph();
-        timer = new Timer();
-
-        resizeBindings();
+        this.node2DList=node2DList;
+        this.edge2DList=edge2DList;
+       resizeBindings();
     }
     public void getRna2D()
+    {
+       root2D.getChildren().clear();
+        nodes.clear();
+        root2D.setRotate(0);
+
+        calculateGraph();
+        double[][] nodeCoordinates = calculateNodeCoordinates();
+        drawNodes(nodeCoordinates);
+        drawEdges();
+
+    }
+
+    private void redrawRna2D()
     {
         root2D.getChildren().clear();
         nodes.clear();
         root2D.setRotate(0);
 
-        calculateGraph();
-        double[][] nodeCoordinates = calculateNodeCoordinates(false);
+        //calculateGraph();
+        double[][] nodeCoordinates = calculateNodeCoordinates();
         drawNodes(nodeCoordinates);
         drawEdges();
-
     }
 
 
@@ -67,7 +78,7 @@ public class Rna2DGraph {
     }
 
     // Use graph to calculate X/Y coordinates of nodes
-    private double[][] calculateNodeCoordinates(Boolean rotate) {
+    private double[][] calculateNodeCoordinates() {
         double[][] coordinates = SpringEmbedder.computeSpringEmbedding(1000, grp.getNumberOfNodes(), grp.getEdges(), null);
         // Get current width/height of drawArea. Leave a small border.
         int drawAreaWidth = (int) (secSubScene.getWidth() * 0.95);
@@ -85,7 +96,11 @@ public class Rna2DGraph {
 
         for (int i = 0; i < nodeCoordinates.length; i++) {
 
-            Rna2DNode  next = new Rna2DNode(nodeCoordinates[i][0], nodeCoordinates[i][1], 3, i);
+            Rna2DNode  next = node2DList.get(i);
+            next.setPosX(nodeCoordinates[i][0]);
+            next.setPosY(nodeCoordinates[i][1]);
+
+
 
             try {
                 next.identify(rnaSeq[i]);
@@ -93,7 +108,6 @@ public class Rna2DGraph {
                 next.identify('?');
             }
 
-            next.setRadius(2);
             nodes.add(next);
             root2D.getChildren().add(next);
 
@@ -102,25 +116,22 @@ public class Rna2DGraph {
     }
 
     private void drawEdges() {
-        // List of edges
-        // Each edge is defined by its start and end node
-        int[][] edges = grp.getEdges();
-        // Assign every Rna2DEdge with two RNa2DNodes
-        for (int i = 0; i < grp.getNumberOfEdges(); i++) {
-            Rna2DEdge edge = new Rna2DEdge(nodes.get(edges[i][0]), nodes.get(edges[i][1]));
-            // Check if edge connects neighboring nodes -> covalent
-            boolean isCovalent = (Math.abs(edges[i][0] - edges[i][1]) == 1);
-            edge.setEdgeColor(isCovalent);
+        // Add elements in list of edges to root2d
+        for (Rna2DEdge edge:edge2DList
+             ) {
+            System.out.println(edge.toString());
             root2D.getChildren().add(edge);
         }
+
+
         // Bring nodes back to front
         nodes.forEach(circle -> circle.toFront());
     }
 
     // Recalculate 2D structure upon window resize
     private void resizeBindings(){
-       secSubScene.heightProperty().addListener(observable -> getRna2D());
-       secSubScene.widthProperty().addListener(observable -> getRna2D());
+       secSubScene.heightProperty().addListener(observable -> redrawRna2D());
+       secSubScene.widthProperty().addListener(observable -> redrawRna2D());
 
 
     }

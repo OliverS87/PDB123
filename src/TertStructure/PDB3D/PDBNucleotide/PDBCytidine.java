@@ -43,6 +43,7 @@ public class PDBCytidine extends PDBNucleotide
         this.pbb = new PDBBackbone();
         // Keep track of atoms with undefined coordinates
         defAtoms = new ArrayList<>(Collections.nCopies(24, false));
+        isSelectedListener();
     }
 
     public PDBRibose getRibose() {
@@ -91,6 +92,7 @@ public class PDBCytidine extends PDBNucleotide
         cytidineGrp.getChildren().addAll(c1toN1, o5ToP);
         // Add tooltip
         Tooltip.install(cytidineGrp, new Tooltip("Cyt_"+this.getResIndex()));
+        cytidineGrp.setOnMouseClicked(event -> printLog.printLogMessage("Selected: Cyt_"+this.getResIndex()));
         return cytidineGrp;
     }
 
@@ -162,6 +164,22 @@ public class PDBCytidine extends PDBNucleotide
         }
 
     }
+
+    // Add listener to react to selection change event
+    private void isSelectedListener()
+    {
+        this.isSelectedProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue)
+            {
+                cyt.setNucleobaseColor(new PhongMaterial(Color.YELLOW.invert()));
+            }
+            else
+            {
+                cyt.setNucleobaseColor(new PhongMaterial(Color.YELLOW));
+            }
+        });
+    }
+
 
     @Override
     public String getType() {

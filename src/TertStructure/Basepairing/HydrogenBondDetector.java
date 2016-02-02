@@ -1,6 +1,7 @@
 package TertStructure.Basepairing;
 
 import GUI.PDB123PrintLog;
+import SecStructure.RNA2D.Rna2DEdge;
 import TertStructure.PDB3D.PDBNucleotide.*;
 import TertStructure.RNAMesh3D.DrawHydrogenBond;
 import javafx.geometry.Point3D;
@@ -18,6 +19,7 @@ public class HydrogenBondDetector {
     private PDB123PrintLog printLog;
     private static double MINBONDANGLE = 110.0;
     private static double MAXBONDDISTANCE = 3.0;
+    private ArrayList<Rna2DEdge> edge2DList;
 
     public HydrogenBondDetector(PDB123PrintLog printLog) {
         this.printLog = printLog;
@@ -34,6 +36,8 @@ public class HydrogenBondDetector {
     public void setLastNtIndex(int lastNtIndex) {
         this.lastNtIndex = lastNtIndex;
     }
+
+    public void setRna2DEdge(ArrayList<Rna2DEdge> edge2DList) {this.edge2DList=edge2DList;}
 
     public Group getHDB()
     {
@@ -162,6 +166,10 @@ public class HydrogenBondDetector {
         uraNt.setBasePairedTo(adeNt);
         adeNt.setBasePaired(true);
         adeNt.setBasePairedTo(uraNt);
+        // Add basepair to 2D rna graph
+        Rna2DEdge edge = new Rna2DEdge(uraNt.getRna2DNode(), adeNt.getRna2DNode());
+        edge.setEdgeStyle("hydroBond");
+        edge2DList.add(edge);
         return hdbAdeUra;
 
 
@@ -285,6 +293,10 @@ public class HydrogenBondDetector {
         guaNt.setBasePairedTo(cytNt);
         cytNt.setBasePaired(true);
         cytNt.setBasePairedTo(guaNt);
+        // Add basepair to 2D rna graph
+        Rna2DEdge edge = new Rna2DEdge(guaNt.getRna2DNode(), cytNt.getRna2DNode());
+        edge.setEdgeStyle("hydroBond");
+        edge2DList.add(edge);
         return  hdbGuaCyt;
     }
 

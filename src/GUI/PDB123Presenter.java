@@ -3,7 +3,9 @@ package GUI;
 import PDBParser.ReadPDB;
 import PrimStructure.ParseSequence;
 import SecStructure.DotBracketNotation.DotBracket;
+import SecStructure.RNA2D.Rna2DEdge;
 import SecStructure.RNA2D.Rna2DGraph;
+import SecStructure.RNA2D.Rna2DNode;
 import TertStructure.Basepairing.HydrogenBondDetector;
 import TertStructure.Center3D.Center3D;
 import TertStructure.PDB3D.PDBNucleotide.PDBNucleotide;;
@@ -13,15 +15,28 @@ import javafx.beans.binding.DoubleBinding;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleDoubleProperty;
+import javafx.geometry.Bounds;
 import javafx.geometry.Point3D;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.Group;
+import javafx.scene.Node;
 import javafx.scene.PerspectiveCamera;
+import javafx.scene.control.Button;
+import javafx.scene.control.Tooltip;
+import javafx.scene.layout.Pane;
+import javafx.scene.paint.Color;
+import javafx.scene.paint.PhongMaterial;
+import javafx.scene.shape.Rectangle;
+import javafx.scene.shape.Sphere;
+import javafx.scene.text.Text;
 import javafx.scene.transform.Rotate;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import javafx.stage.Window;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Map;
 
 /**
@@ -45,6 +60,8 @@ public class PDB123Presenter {
     private String dotBracketSeq, rnaSeq;
     private ParseSequence parseSeq;
     private BooleanProperty showBackbone, showSugar, showNucleoBase;
+    private ArrayList<Rna2DNode> Node2DList;
+    private ArrayList<Rna2DEdge> Edge2DList;
 
     public PDB123Presenter(Stage primaryStage) {
         // Initialize class variables
@@ -68,14 +85,30 @@ public class PDB123Presenter {
         setCheckboxes();
         // Set center-button actions
         setCenterButtons();
+        // Test function for innovative new moduls
+       //test();
 
     }
 
     private void aboutFunction()
     {
         PDB123View.getMenuItemClear().setOnAction(event -> {
-            this.rotateStructureX.setAngle(45.);
+            test();
         });
+
+    }
+
+    private void test()
+    {
+    Text t1 = new Text("A");
+        Text t2 = new Text("N");
+        t1.setOnMouseClicked(event -> {
+            printLog.printLogMessage("Klappt :-)");
+            t1.setFill(Color.RED);
+
+        });
+        Rectangle r = new Rectangle(t1.getX(), t1.getY(), t1.getStrokeWidth(), t1.getLineSpacing());
+        PDB123View.getPrimStructure().getChildren().addAll(t1,t2, r);
 
     }
 
@@ -85,6 +118,9 @@ public class PDB123Presenter {
       centerCamera3D();
         setRotation3D();
     });
+        PDB123View.getCenter2D().setOnAction(event -> {
+            center2D();
+        });
     }
 
     private void setCheckboxes()
@@ -105,6 +141,17 @@ public class PDB123Presenter {
         cam.setTranslateZ((PDB123View.get3DSubScene().getWidth()+PDB123View.get3DSubScene().getHeight())/1.7);
     }
 
+    private void center2D()
+    {
+
+        Group root2D = PDB123View.getSecDrawings();
+        root2D.setScaleX(0.);
+        root2D.setScaleY(0.);
+        root2D.setTranslateX(0.);
+        root2D.setTranslateY(0.);
+        root2D.setRotate(0.);
+    }
+
     // Initialize class variables
     private void initClassVariables(Stage primaryStage) {
         this.stage = primaryStage;
@@ -118,6 +165,7 @@ public class PDB123Presenter {
         this.showNucleoBase = new SimpleBooleanProperty(true);
         this.showSugar = new SimpleBooleanProperty(true);
         this.showBackbone = new SimpleBooleanProperty(true);
+        this.Node2DList = new ArrayList<>();
     }
 
     // Menu -> exit
@@ -147,7 +195,9 @@ public class PDB123Presenter {
                 ntMap = pdbReader.getNtMap();
                 firstNtIndex = pdbReader.getFirstNtIndex();
                 lastNtIndex = pdbReader.getLastNtIndex();
-                Rna3D.generate3DStructure(firstNtIndex, lastNtIndex, "resType", ntMap, showBackbone, showSugar, showNucleoBase);
+                Node2DList = new ArrayList<>();
+                Edge2DList = new ArrayList<>();
+                Rna3D.generate3DStructure(firstNtIndex, lastNtIndex, "resType", ntMap, showBackbone, showSugar, showNucleoBase, Node2DList, Edge2DList);
                 // (re)center camera
                 centerCamera3D();
                 // Identify and visualize hydrogen bonds
@@ -156,11 +206,14 @@ public class PDB123Presenter {
                 calculateDotBracketNotation();
                 // Once 3D structure preparation is finished,
                 // Produce 1D structure presentation
-                rnaSeq = parseSeq.parseRnaSeq(ntMap, firstNtIndex, lastNtIndex);
-                PDB123View.getPrimStructure().setText(rnaSeq);
+                rnaSeq = parseSeq.parseRnaSeq(ntMap, firstNtIndex, lastNtIndex, PDB123View.getPrimStructure());
+
+
                 // produce 2D structure presentation
-                Graph2D = new Rna2DGraph(this.getPDB123View().getSecDrawings(), this.getPDB123View().getSubScene2D(), dotBracketSeq, rnaSeq, printLog );
+                Graph2D = new Rna2DGraph(this.getPDB123View().getSecDrawings(), this.getPDB123View().getSubScene2D(), dotBracketSeq, rnaSeq, printLog, Node2DList, Edge2DList);
                 Graph2D.getRna2D();
+
+
 
             } catch (IOException e) {
                 printLog.printLogMessage(e.getMessage());
@@ -186,6 +239,7 @@ public class PDB123Presenter {
         hbDetector.setFirstNtIndex(this.firstNtIndex);
         hbDetector.setLastNtIndex(this.lastNtIndex);
         hbDetector.setNtMap(this.ntMap);
+        hbDetector.setRna2DEdge(this.Edge2DList);
         Group hydrogenBonds = hbDetector.getHDB();
         PDB123View.getThreeDrawings().getChildren().add(hydrogenBonds);
 
@@ -217,7 +271,6 @@ public class PDB123Presenter {
         PerspectiveCamera cam = PDB123View.get3DCamera();
         // Save initial mouseX/Y
         PDB123View.get3DSubScene().setOnMousePressed(event -> {
-            System.out.println("Mouse click detected");
             mouseXold = mouseXnew = event.getX();
             mouseYold = mouseYNew = event.getY();
             mouseXDelta = 0;
@@ -235,8 +288,10 @@ public class PDB123Presenter {
                 cam.setTranslateZ(cam.getTranslateZ() + mouseYDelta);
             }
             if (event.isControlDown()) {
-                cam.setTranslateX(cam.getTranslateX() - mouseXDelta * 0.2);
-                cam.setTranslateY(cam.getTranslateY() - mouseYDelta * 0.2);
+                double newX = cam.getTranslateX() - mouseXDelta * 0.2;
+                double newY = cam.getTranslateY() - mouseYDelta * 0.2;
+                cam.setTranslateX(newX);
+                cam.setTranslateY(newY);
             }
             if (!event.isShiftDown() && !event.isControlDown()) {
                 rotateStructureY.setAngle(rotateStructureY.getAngle() + mouseXDelta * 0.2);
@@ -252,7 +307,6 @@ public class PDB123Presenter {
         Group root2D = PDB123View.getSecDrawings();
         // Save initial mouseX/Y
         PDB123View.getSubScene2D().setOnMousePressed(event -> {
-            System.out.println("Mouse click detected");
             mouseXold = mouseXnew = event.getX();
             mouseYold = mouseYNew = event.getY();
             mouseXDelta = 0;
@@ -271,8 +325,8 @@ public class PDB123Presenter {
                 root2D.setScaleY(root2D.getScaleY()+mouseYDelta*0.4);
             }
             if (event.isControlDown()) {
-                root2D.setTranslateX(root2D.getTranslateX()+mouseXDelta*0.2);
-                root2D.setTranslateY(root2D.getTranslateY()+mouseYDelta*0.2);
+                root2D.setTranslateX(root2D.getTranslateX()+mouseXDelta*0.6);
+                root2D.setTranslateY(root2D.getTranslateY()+mouseYDelta*0.6);
 
             }
             if (!event.isShiftDown() && ! event.isControlDown()){

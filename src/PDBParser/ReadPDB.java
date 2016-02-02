@@ -24,6 +24,8 @@ public class ReadPDB
     private Map<Integer, PDBNucleotide> nucleotideIndex;
     // Store the first and last nucleotide index
     private int firstNtIndex, lastNtIndex;
+    // Store the offset of the molecule from the origin
+    private double xOffset, yOffset, zOffset;
     private PDB123PrintLog log;
     public ReadPDB(PDB123PrintLog log)  {
         this.log=log; this.ntList = new ArrayList<>();
@@ -31,11 +33,41 @@ public class ReadPDB
     // Set file path to PDB file, then read PDB file
     public void setFilePath(String filePath) throws IOException {
         this.br = new BufferedReader(new FileReader(filePath));
+        calculateCenterOffset();
+        this.br = new BufferedReader(new FileReader(filePath));
         // Remove previous Nucleotides
         ntList.clear();
         readPDB();
     }
 
+
+
+    private void calculateCenterOffset() throws IOException
+    {
+        String line = "";
+        double xSum, ySum, zSum;
+        xSum=ySum=zSum=0;
+        int atomCounter = 0;
+        while ((line = br.readLine()) != null)
+        {
+            // Ignore lines NOT starting with ATOM
+            if (!line.startsWith("ATOM")) continue;
+            atomCounter++;
+            // Split line at blankspaces
+            String[] lineSplit = line.split("\\s+");
+            // Get XYZ coordinates
+            String posX = lineSplit[6];
+            String posY = lineSplit[7];
+            String posZ = lineSplit[8];
+            xSum+=Double.parseDouble(posX);
+            ySum+=Double.parseDouble(posY);
+            zSum+=Double.parseDouble(posZ);
+        }
+         xOffset = xSum/atomCounter;
+         yOffset = ySum/atomCounter;
+         zOffset = zSum/atomCounter;
+
+    }
 
     // PDB123StartUp function of PDBreader. Converts information from PDB file
     // into Java objects. PDBNucleotides store all coordinates,
@@ -75,6 +107,10 @@ public class ReadPDB
             String posX = lineSplit[6];
             String posY = lineSplit[7];
             String posZ = lineSplit[8];
+            // Substract offset
+            posX = (Double.parseDouble(posX)-xOffset)+"";
+            posY = (Double.parseDouble(posY)-yOffset)+"";
+            posZ = (Double.parseDouble(posZ)-zOffset)+"";
             // Collect atomID and posX,Y and Z in one String[]
             String[] posXYZ = new String[] {atomID, posX,posY, posZ};
             // Does a new nucleotide start at the current position?
