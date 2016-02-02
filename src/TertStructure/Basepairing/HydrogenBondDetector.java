@@ -20,6 +20,7 @@ public class HydrogenBondDetector {
     private static double MINBONDANGLE = 110.0;
     private static double MAXBONDDISTANCE = 3.0;
     private ArrayList<Rna2DEdge> edge2DList;
+    private Group structure3D;
 
     public HydrogenBondDetector(PDB123PrintLog printLog) {
         this.printLog = printLog;
@@ -39,7 +40,9 @@ public class HydrogenBondDetector {
 
     public void setRna2DEdge(ArrayList<Rna2DEdge> edge2DList) {this.edge2DList=edge2DList;}
 
-    public Group getHDB()
+    public void setStructure3D(Group structure3D) {this.structure3D = structure3D;}
+
+    public void detectHDB()
     {
         // Container for hydrogen bond visualizations
         Group hydrogenBonds = new Group();
@@ -63,7 +66,7 @@ public class HydrogenBondDetector {
                 }
             }
 
-        return hydrogenBonds;
+        structure3D.getChildren().add(hydrogenBonds);
     }
     private Group makeHDB(PDBNucleotide nt1, PDBNucleotide nt2)
     {

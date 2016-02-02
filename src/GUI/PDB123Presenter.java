@@ -1,12 +1,10 @@
 package GUI;
 
 import PDBParser.ReadPDB;
-import PrimStructure.ParseSequence;
-import SecStructure.DotBracketNotation.DotBracket;
+import PrimStructure.ParsePrimaryStructure;
 import SecStructure.RNA2D.Rna2DEdge;
 import SecStructure.RNA2D.Rna2DGraph;
 import SecStructure.RNA2D.Rna2DNode;
-import TertStructure.Basepairing.HydrogenBondDetector;
 import TertStructure.PDB3D.PDBNucleotide.PDBNucleotide;;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -33,17 +31,12 @@ public class PDB123Presenter {
     private GUI.PDB123View PDB123View;
     private Stage stage;
     private ReadPDB pdbReader;
-    private Rna2DGraph Graph2D;
-    private PDB123PresenterStructure Rna3D;
+    private PDB123PresenterStructure Rna123DRepresentation;
     private Map<Integer, PDBNucleotide> ntMap;
     private int firstNtIndex, lastNtIndex;
     private Rotate rotateStructureX, rotateStructureY;
     private double mouseXold, mouseXnew, mouseYold, mouseYNew, mouseXDelta, mouseYDelta;
-    private HydrogenBondDetector hbDetector;
     private PDB123PrintLog printLog;
-    private DotBracket dotBracket;
-    private String dotBracketSeq, rnaSeq;
-    private ParseSequence parseSeq;
     private BooleanProperty showBackbone, showSugar, showNucleoBase;
     private ArrayList<Rna2DNode> Node2DList;
     private ArrayList<Rna2DEdge> Edge2DList;
@@ -130,10 +123,10 @@ public class PDB123Presenter {
     {
 
         Group root2D = PDB123View.getSecDrawings();
-        root2D.setScaleX(0.);
-        root2D.setScaleY(0.);
-        root2D.setTranslateX(0.);
-        root2D.setTranslateY(0.);
+        root2D.setScaleX(1.);
+        root2D.setScaleY(1.);
+        root2D.setTranslateX(0);
+        root2D.setTranslateY(0);
         root2D.setRotate(0.);
     }
 
@@ -143,14 +136,12 @@ public class PDB123Presenter {
         PDB123View = new PDB123View(primaryStage);
         this.printLog = new PDB123PrintLog(PDB123View.getLog());
         this.pdbReader = new ReadPDB(this.printLog);
-        this.hbDetector = new HydrogenBondDetector(printLog);
-        this.dotBracket = new DotBracket(printLog);
-        this.parseSeq = new ParseSequence();
-        this.Rna3D = new PDB123PresenterStructure(PDB123View.getThreeDrawings());
+        this.Rna123DRepresentation = new PDB123PresenterStructure(PDB123View.getThreeDrawings(), printLog);
         this.showNucleoBase = new SimpleBooleanProperty(true);
         this.showSugar = new SimpleBooleanProperty(true);
         this.showBackbone = new SimpleBooleanProperty(true);
         this.Node2DList = new ArrayList<>();
+        this.Edge2DList = new ArrayList<>();
     }
 
     // Menu -> exit
@@ -180,55 +171,27 @@ public class PDB123Presenter {
                 ntMap = pdbReader.getNtMap();
                 firstNtIndex = pdbReader.getFirstNtIndex();
                 lastNtIndex = pdbReader.getLastNtIndex();
-                Node2DList = new ArrayList<>();
-                Edge2DList = new ArrayList<>();
-                Rna3D.generate3DStructure(firstNtIndex, lastNtIndex, "resType", ntMap, showBackbone, showSugar, showNucleoBase, Node2DList, Edge2DList);
                 // (re)center camera
                 centerCamera3D();
-                // Identify and visualize hydrogen bonds
-                detectHydrogenBonds();
-                // Calculate dot-bracket notation for current PDB file
-                calculateDotBracketNotation();
-                // Once 3D structure preparation is finished,
-                // Produce 1D structure presentation
-                rnaSeq = parseSeq.parseRnaSeq(ntMap, firstNtIndex, lastNtIndex, PDB123View.getPrimStructure());
-
-
-                // produce 2D structure presentation
-                Graph2D = new Rna2DGraph(this.getPDB123View().getSecDrawings(), this.getPDB123View().getSubScene2D(), dotBracketSeq, rnaSeq, printLog, Node2DList, Edge2DList);
-                Graph2D.getRna2D();
+                center2D();
+                // Derive 1D, 2D and 3D RNA representation from ntMap
+                // ntMap contains PDBNucleotides (Java representation of PDB 3D coordinates)
+                // and residue index positions
+                Rna123DRepresentation.generate123DRepresentation(firstNtIndex, lastNtIndex, "resType", ntMap, showBackbone, showSugar, showNucleoBase, Node2DList, Edge2DList, PDB123View.getPrimStructure(), PDB123View.getSecDrawings(), PDB123View.getSubScene2D());
 
 
 
             } catch (IOException e) {
-                printLog.printLogMessage(e.getMessage());
+                printLog.printLogMessage("Error while parsing PDB file.");
             }
         });
     }
 
 
 
-    private void calculateDotBracketNotation()
-    {
-        // Provide reference to ntMap
-        dotBracket.setNtMap(this.ntMap);
-        // Provide first + last nt indices
-        dotBracket.setFirstNtIndex(this.firstNtIndex);
-        dotBracket.setLastNtIndex(this.lastNtIndex);
-        // Calculate dotBracket notation
-        this.dotBracketSeq = dotBracket.getDotBracket();
-    }
 
-    private void detectHydrogenBonds()
-    {
-        hbDetector.setFirstNtIndex(this.firstNtIndex);
-        hbDetector.setLastNtIndex(this.lastNtIndex);
-        hbDetector.setNtMap(this.ntMap);
-        hbDetector.setRna2DEdge(this.Edge2DList);
-        Group hydrogenBonds = hbDetector.getHDB();
-        PDB123View.getThreeDrawings().getChildren().add(hydrogenBonds);
 
-    }
+
 
 
     private void setCameraClip3D()
@@ -296,6 +259,7 @@ public class PDB123Presenter {
             mouseYold = mouseYNew = event.getY();
             mouseXDelta = 0;
             mouseYDelta = 0;
+
         });
         // Transformations depend directly on mouseXYZ delta
         PDB123View.getSubScene2D().setOnMouseDragged(event -> {
@@ -308,6 +272,7 @@ public class PDB123Presenter {
             if (event.isShiftDown()) {
                 root2D.setScaleX(root2D.getScaleX() + mouseYDelta*0.4);
                 root2D.setScaleY(root2D.getScaleY()+mouseYDelta*0.4);
+                System.out.println("New Scale: "+root2D.getScaleX()+"_"+root2D.getScaleY());
             }
             if (event.isControlDown()) {
                 root2D.setTranslateX(root2D.getTranslateX()+mouseXDelta*0.6);

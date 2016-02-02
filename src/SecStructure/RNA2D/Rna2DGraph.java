@@ -29,11 +29,11 @@ public class Rna2DGraph {
     private ArrayList<Rna2DEdge> edge2DList;
 
 
-    public Rna2DGraph(Group secDrawings, SubScene secSubScene, String dotBracketSeq, String rnaSeq, PDB123PrintLog log, ArrayList<Rna2DNode> node2DList, ArrayList<Rna2DEdge> edge2DList) {
+    public Rna2DGraph(Group secDrawings, SubScene secSubScene, String dotBracketSeq,  PDB123PrintLog log, ArrayList<Rna2DNode> node2DList, ArrayList<Rna2DEdge> edge2DList) {
         this.root2D = secDrawings;
         this.dotBracketSeq = dotBracketSeq;
         this.secSubScene = secSubScene;
-        this.rnaSeq = rnaSeq.toCharArray();
+        this.rnaSeq = null;
         this.log = log;
         this.nodes = new ArrayList<>();
         this.grp = new Graph();
@@ -102,11 +102,11 @@ public class Rna2DGraph {
 
 
 
-            try {
-                next.identify(rnaSeq[i]);
-            } catch (ArrayIndexOutOfBoundsException e) {
-                next.identify('?');
-            }
+           // try {
+             //   next.identify(rnaSeq[i]);
+            //} catch (ArrayIndexOutOfBoundsException e) {
+              //  next.identify('?');
+            //}
 
             nodes.add(next);
             root2D.getChildren().add(next);

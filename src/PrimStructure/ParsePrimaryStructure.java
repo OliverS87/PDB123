@@ -11,12 +11,11 @@ import java.util.Map;
  * As side-effect the 1D structure is added to
  * the Textflow area
  */
-public class ParseSequence
+public class ParsePrimaryStructure
 {
     public String parseRnaSeq(Map<Integer, PDBNucleotide> ntMap, int firstNtIndex, int lastNtIndex, TextFlow textFlow)
     {
         StringBuffer sb = new StringBuffer(lastNtIndex);
-        textFlow.getChildren().clear();
         for (int i = firstNtIndex; i <= lastNtIndex; i++)
         {
             if (ntMap.containsKey(i))
