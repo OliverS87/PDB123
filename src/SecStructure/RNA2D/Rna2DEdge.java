@@ -1,5 +1,7 @@
 package SecStructure.RNA2D;
 
+import SelectionModel.PDB123SelectionModel;
+import SelectionModel.Selectable;
 import javafx.beans.property.BooleanProperty;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
@@ -8,7 +10,7 @@ import javafx.scene.shape.Line;
  * Created by oliver on 30.11.15.
  * Shape Rn2DEdge based on Shape Line
  */
-public class Rna2DEdge extends Line
+public class Rna2DEdge extends Line implements Selectable
 {
     private BooleanProperty isSelected;
     private Color edgeColor;
@@ -19,6 +21,9 @@ public class Rna2DEdge extends Line
         this.startYProperty().bind(n1.posYProperty());
         this.endXProperty().bind(n2.posXProperty());
         this.endYProperty().bind(n2.posYProperty());
+        // Register Rna2DEdge at PDB123SelectionModel
+       // PDB123SelectionModel.registerSelectable(this);
+        //PDB123SelectionModel.addMouseHandler(this);
 
     }
     // Covalent bonds are black, non-covalent blue
@@ -31,18 +36,15 @@ public class Rna2DEdge extends Line
         }
 
     }
-    private void onSelection()
-    {
-        this.setOnMouseClicked(event -> {
-            isSelected.setValue(!isSelected.getValue());
-        });
+
+
+    @Override
+    public boolean isSelected() {
+        return isSelected.getValue();
     }
-    private void selectionListener()
-    {
-        isSelected.addListener((observable, oldValue, newValue) -> {
-            if (newValue){
-                this.setStrokeDashOffset(0.2);
-            }
-        });
+
+    @Override
+    public void setSelected(boolean sel) {
+    isSelected.setValue(sel);
     }
 }

@@ -8,6 +8,7 @@ import TertStructure.PDB3D.PDBBackbone.PDBBackbone;
 import TertStructure.PDB3D.PDBNucleobases.PDBAdenine;
 import TertStructure.PDB3D.PDBSugar.PDBRibose;
 import TertStructure.RNA3DComponents.DrawLine;
+import javafx.scene.control.Tooltip;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.PhongMaterial;
 
@@ -74,7 +75,7 @@ public class PDBAdenosine extends PDBNucleotide
     // Return 3D structure. Add connecting lines between individual parts.
     // Visibility of components can be activated/deactivated by user
     @Override
-    public Group getStructure(BooleanProperty showBackbone, BooleanProperty showSugar, BooleanProperty showBase) {
+    public void getStructure(BooleanProperty showBackbone, BooleanProperty showSugar, BooleanProperty showBase) {
         if (!this.allAtomsDefined()) printLog.printLogMessage("WARNING: Ade_"+this.getResIndex()+" not completely defined.");
         Group adenosineGrp = new Group();
         PhongMaterial adeMaterial = new PhongMaterial();
@@ -97,15 +98,18 @@ public class PDBAdenosine extends PDBNucleotide
         if (pbb.getP() == null)
         {
             adenosineGrp.getChildren().addAll(c1ToN9);
-            return adenosineGrp;
-        }
-        // Connect phosphatgroup and ribose
-        DrawLine o5ToP = new DrawLine(ribo.getO5(), pbb.getP());
-        o5ToP.visibleProperty().bind(showBackbone.and(showSugar));
-        adenosineGrp.getChildren().addAll(c1ToN9, o5ToP);
-        // Add tooltip
 
-        return adenosineGrp;
+        }
+        else {
+            // Connect phosphatgroup and ribose
+            DrawLine o5ToP = new DrawLine(ribo.getO5(), pbb.getP());
+            o5ToP.visibleProperty().bind(showBackbone.and(showSugar));
+            adenosineGrp.getChildren().addAll(c1ToN9, o5ToP);
+
+        }
+        // Add tooltip
+        Tooltip.install(this, new Tooltip("Ade_"+this.getResIndex()));
+        this.getChildren().add(adenosineGrp);
     }
     // Color purin ring according to colormode
     // Colormode could be:
@@ -115,8 +119,8 @@ public class PDBAdenosine extends PDBNucleotide
     {
         switch (colorMode){
             case("resType"):{
-                this.unselected = Color.DARKGREEN;
-                this.selected = Color.DARKGREEN.invert();
+                this.unselected = Color.web("#6a9738");
+                this.selected = Color.web("#6afc38");
 
             } break;
             case("baseType"):{

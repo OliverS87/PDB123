@@ -2,6 +2,8 @@ package TertStructure.PDB3D.PDBNucleotide;
 
 import GUI.PDB123PrintLog;
 import SecStructure.RNA2D.Rna2DNode;
+import SelectionModel.PDB123SelectionModel;
+import SelectionModel.Selectable;
 import TertStructure.PDB3D.PDBSugar.PDBRibose;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
@@ -19,7 +21,7 @@ import java.util.ArrayList;
  * Allows access to structure and 5', 3' end
  * without knowledge about the actual type of residue
  */
-public abstract class PDBNucleotide {
+public abstract class PDBNucleotide extends Group implements Selectable{
     private int resIndex;
     private ObjectProperty<Color> ntColor = new SimpleObjectProperty<>();
     private Rna2DNode rna2DNode;
@@ -35,6 +37,8 @@ public abstract class PDBNucleotide {
     public PDBNucleotide(PDB123PrintLog log)
     {
         this.printLog = log;
+        PDB123SelectionModel.registerSelectable(this);
+        PDB123SelectionModel.addMouseHandler(this);
     }
     // Set the position index of the nucleotide
     public void setResIndex(int resIndex) {
@@ -45,7 +49,7 @@ public abstract class PDBNucleotide {
     }
 
     public abstract String getType();
-    public abstract Group getStructure(BooleanProperty showBackbone, BooleanProperty showSugar, BooleanProperty showNucleoBase);
+    public abstract void getStructure(BooleanProperty showBackbone, BooleanProperty showSugar, BooleanProperty showNucleoBase);
     public abstract Point3D getFivePrimeEnd();
     public abstract Point3D getThreePrimeEnd();
     public abstract void setColorMode(String colorMode);
@@ -79,5 +83,15 @@ public abstract class PDBNucleotide {
 
     public ObjectProperty<Color> ntColorProperty() {
         return ntColor;
+    }
+
+    @Override
+    public boolean isSelected() {
+        return isSelected.getValue();
+    }
+
+    @Override
+    public void setSelected(boolean sel) {
+    isSelected.setValue(sel);
     }
 }

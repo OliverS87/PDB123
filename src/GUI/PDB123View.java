@@ -51,7 +51,7 @@ public class PDB123View extends VBox {
     // Buttons for re-centering
     private Button center3D, center2D;
     // Checkboxes to add/remove drawings of 3D or 2D components
-    CheckBox cBsugar3D, cBnucleoBase3D, cBpBB3D, cBnodes2D, cBedges2D;
+    CheckBox cBsugar3D, cBnucleoBase3D, cBpBB3D, cBhDB, cBnodes2D, cBedges2D;
 
 
 
@@ -75,7 +75,7 @@ public class PDB123View extends VBox {
         threeDrawings = new Group();
         subScene1D = new SubScene(primStructure, 0, 0);
         subScene2D = new SubScene(secDrawings, 0, 0);
-        subScene3D = new SubScene(threeDrawings, 0, 0, true, SceneAntialiasing.DISABLED);
+       subScene3D = new SubScene(threeDrawings, 500, 400, true, SceneAntialiasing.DISABLED);
         stack3D = new StackPane();
         stack2D = new StackPane();
         topPane3D = new BorderPane();
@@ -90,6 +90,7 @@ public class PDB123View extends VBox {
         cBsugar3D = new CheckBox("Ribose");
         cBnucleoBase3D = new CheckBox("Nucleobase");
         cBpBB3D = new CheckBox("Backbone");
+        cBhDB = new CheckBox("Hydrogen bonds");
         cBnodes2D = new CheckBox("Show nodes");
         cBedges2D = new CheckBox("Show edges");
         // Hboxes for 3D and 2D controls
@@ -103,9 +104,8 @@ public class PDB123View extends VBox {
         // Stack subScene3D and topPane3D
         stack3D.setAlignment(Pos.CENTER);
         topPane3D.setPickOnBounds(false);
-        stack3D.setPickOnBounds(false);
-        subScene3D.setPickOnBounds(true);
-        controls3D.getChildren().addAll(center3D, cBnucleoBase3D, cBsugar3D, cBpBB3D);
+        subScene3D.setFill(Color.TRANSPARENT);
+        controls3D.getChildren().addAll(center3D, cBnucleoBase3D, cBsugar3D, cBpBB3D, cBhDB);
         controls3D.setSpacing(5);
         controls3D.setPadding(new Insets(5));
         controls3D.setAlignment(Pos.CENTER_RIGHT);
@@ -131,6 +131,7 @@ public class PDB123View extends VBox {
         this.getChildren().addAll(subScene1D2D, subScenelog3D);
         subScene1D2D.getChildren().addAll(subScene1D, stack2D);
         subScenelog3D.getChildren().addAll(subSceneLog, stack3D);
+
         // Resize subscenes upon stage size change
         DoubleBinding primaryStageHeight = this.heightProperty().multiply(0.85);
         DoubleBinding primaryStageWidth = this.widthProperty().multiply(0.95);
@@ -246,5 +247,13 @@ public class PDB123View extends VBox {
 
     public Pane getTopPane3D() {
         return topPane3D;
+    }
+
+    public StackPane getStack3D() {
+        return stack3D;
+    }
+
+    public HBox getSubScenelog3D() {
+        return subScenelog3D;
     }
 }

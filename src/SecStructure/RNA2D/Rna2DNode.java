@@ -1,5 +1,7 @@
 package SecStructure.RNA2D;
 
+import SelectionModel.PDB123SelectionModel;
+import SelectionModel.Selectable;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleDoubleProperty;
@@ -13,7 +15,7 @@ import javafx.scene.shape.Circle;
  * Created by oliver on 30.11.15.
  * Shape for RNa2DNode based on Circle
  */
-public class Rna2DNode extends Circle
+public class Rna2DNode extends Circle implements Selectable
 {
     // X/Y coordinates property bindings
     private SimpleDoubleProperty posX = new SimpleDoubleProperty();
@@ -104,12 +106,20 @@ public class Rna2DNode extends Circle
 
         }
         Tooltip.install(this, new Tooltip(ntId + " " + nodeNr));
-        this.setOnMouseClicked(event -> {
-            isSelected.setValue(!isSelected.getValue());
-        });
+        // Register Rna2DNode at PDB123SelectionModel
+        PDB123SelectionModel.registerSelectable(this);
+        PDB123SelectionModel.addMouseHandler(this);
+
 
     }
 
+    @Override
+    public boolean isSelected() {
+        return isSelected.getValue();
+    }
 
-
+    @Override
+    public void setSelected(boolean sel) {
+    isSelected.setValue(sel);
+    }
 }

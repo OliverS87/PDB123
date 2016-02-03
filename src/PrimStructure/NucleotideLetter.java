@@ -1,5 +1,7 @@
 package PrimStructure;
 
+import SelectionModel.PDB123SelectionModel;
+import SelectionModel.Selectable;
 import javafx.beans.property.BooleanProperty;
 import javafx.scene.control.Tooltip;
 import javafx.scene.paint.Color;
@@ -12,7 +14,7 @@ import javafx.scene.text.Text;
  * Text representation of a single nucleotide letter
  * Adds selection functionality to a letter
  */
-public class NucleotideLetter extends Text
+public class NucleotideLetter extends Text implements Selectable
 {
     private String letter;
     private BooleanProperty isSelected;
@@ -26,16 +28,18 @@ public class NucleotideLetter extends Text
         this.underlineProperty().bind(isSelected);
         letterColor();
 
-        mouseClickListener();
+        //mouseClickListener();
+        PDB123SelectionModel.registerSelectable(this);
+        PDB123SelectionModel.addMouseHandler(this);
         setFont(Font.font ("Verdana", FontWeight.BOLD, 24));
         Tooltip.install(this, new Tooltip(ntId + " " + resIndex));
     }
-    private void mouseClickListener()
-    {
-        this.setOnMouseClicked(event -> {
-            isSelected.setValue(!isSelected.getValue());
-        });
-    }
+    //private void mouseClickListener()
+    //{
+      //  this.setOnMouseClicked(event -> {
+        //    isSelected.setValue(!isSelected.getValue());
+        //});
+    //}
 
 
     private void letterColor()
@@ -63,5 +67,15 @@ public class NucleotideLetter extends Text
 
                 break;
          }
+    }
+
+    @Override
+    public boolean isSelected() {
+        return isSelected.getValue();
+    }
+
+    @Override
+    public void setSelected(boolean sel) {
+    isSelected.setValue(sel);
     }
 }

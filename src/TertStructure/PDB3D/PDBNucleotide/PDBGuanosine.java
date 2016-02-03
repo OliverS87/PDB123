@@ -138,7 +138,7 @@ public class PDBGuanosine extends PDBNucleotide
     // Return 3D structure. Add connecting lines between individual parts.
     // Visibility of components can be activated/deactivated by user
     @Override
-    public Group getStructure(BooleanProperty showBackbone, BooleanProperty showSugar, BooleanProperty showBase) {
+    public void getStructure(BooleanProperty showBackbone, BooleanProperty showSugar, BooleanProperty showBase) {
         if (!this.allAtomsDefined()) printLog.printLogMessage("WARNING: Gua_"+this.getResIndex()+" not completely defined.");
         Group guanosineGrp = new Group();
         // Build structure for ribose, nucleobase and phosphat backbone
@@ -161,15 +161,16 @@ public class PDBGuanosine extends PDBNucleotide
         if (pbb.getP() == null)
         {
             guanosineGrp.getChildren().addAll(c1ToN9);
-            return guanosineGrp;
+
         }
-        DrawLine o5ToP = new DrawLine(ribo.getO5(), pbb.getP());
-        o5ToP.visibleProperty().bind(showSugar.and(showBackbone));
-        guanosineGrp.getChildren().addAll(c1ToN9, o5ToP);
+       else {
+            DrawLine o5ToP = new DrawLine(ribo.getO5(), pbb.getP());
+            o5ToP.visibleProperty().bind(showSugar.and(showBackbone));
+            guanosineGrp.getChildren().addAll(c1ToN9, o5ToP);
+        }
         // Add tooltip
-        Tooltip.install(guanosineGrp, new Tooltip("Gua_"+this.getResIndex()));
-        guanosineGrp.setOnMouseClicked(event -> printLog.printLogMessage("Selected: Gua_"+this.getResIndex()));
-        return guanosineGrp;
+        Tooltip.install(this, new Tooltip("Gua_"+this.getResIndex()));
+        this.getChildren().add(guanosineGrp);
     }
 
     // Color purin ring according to colormode
@@ -180,8 +181,8 @@ public class PDBGuanosine extends PDBNucleotide
     {
         switch (colorMode){
             case("resType"):{
-                this.unselected = Color.CYAN;
-                this.selected = Color.CYAN.invert();
+                this.unselected = Color.web("#589aff");
+                this.selected = Color.CYAN;
 
             } break;
             case("baseType"):{

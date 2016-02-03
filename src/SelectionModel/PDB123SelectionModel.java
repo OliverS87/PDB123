@@ -1,84 +1,44 @@
 package SelectionModel;
 
-import javafx.collections.ObservableList;
-import javafx.scene.control.MultipleSelectionModel;
+import javafx.scene.Node;
+
+import java.util.ArrayList;
 
 /**
- * Created by oliver on 02.02.16.
+ * Created by oliver on 03.02.16.
  */
-public class PDB123SelectionModel<Selectable> extends MultipleSelectionModel<Selectable> {
-    @Override
-    public ObservableList<Integer> getSelectedIndices() {
-        return null;
+public class PDB123SelectionModel
+{
+    private static ArrayList<Selectable> selectablesLst;
+
+    public static void initSelectionModel()
+    {
+        selectablesLst = new ArrayList<>();
     }
-
-    @Override
-    public ObservableList<Selectable> getSelectedItems() {
-        return null;
+    public static void unselectAll()
+    {
+        for (Selectable s: selectablesLst
+             ) {
+            s.setSelected(false);
+        }
     }
-
-    @Override
-    public void selectIndices(int index, int... indices) {
-
+    public static void registerSelectable(Selectable s)
+    {
+        selectablesLst.add(s);
     }
-
-    @Override
-    public void selectAll() {
-
-    }
-
-    @Override
-    public void clearAndSelect(int index) {
-
-    }
-
-    @Override
-    public void select(int index) {
-
-    }
-
-    @Override
-    public void select(Selectable obj) {
-
-    }
-
-    @Override
-    public void clearSelection(int index) {
-
-    }
-
-    @Override
-    public void clearSelection() {
-
-    }
-
-    @Override
-    public boolean isSelected(int index) {
-        return false;
-    }
-
-    @Override
-    public boolean isEmpty() {
-        return false;
-    }
-
-    @Override
-    public void selectPrevious() {
-
-    }
-
-    @Override
-    public void selectNext() {
-
-    }
-
-    @Override
-    public void selectFirst() {
-
-    }
-
-    @Override
-    public void selectLast() {
-
+    public static void addMouseHandler(Node n)
+    {
+       n.setOnMouseClicked(event -> {
+           if (!event.isShiftDown())
+           {
+               boolean nodeIsSelected = ((Selectable) n).isSelected();
+               unselectAll();
+               ((Selectable) n).setSelected(!nodeIsSelected);
+           }
+           if(event.isShiftDown())
+           {
+               ((Selectable) n).setSelected(!((Selectable) n).isSelected());
+           }
+       });
     }
 }

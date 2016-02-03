@@ -100,6 +100,8 @@ public class HydrogenBondDetector {
         // Only returned if a stable base pair between ade and ura
         // is confirmed
         Group hdbAdeUra = new Group();
+        // Remember if HDB had to be detected without hydrogen atom(s)
+        Boolean missingHydrogen = false;
         // Check first potential hydrogenbond
         // between ade NH2(6) and ura O4
         // ade NH2(6) has two hydrogens: H61 and H62
@@ -120,7 +122,7 @@ public class HydrogenBondDetector {
             if (adeN6.distance(uraO4) <= MAXBONDDISTANCE+1)
             {
                 hdbAdeUra.getChildren().add(new DrawHydrogenBond(adeN6, uraO4));
-                printLog.printLogMessage("WARNING: HDB estimated w/o Hydrogen atom!");
+                missingHydrogen=true;
             }
             else
             {
@@ -171,7 +173,7 @@ public class HydrogenBondDetector {
             if (adeN1.distance(uraN3) <= MAXBONDDISTANCE+1)
             {
                 hdbAdeUra.getChildren().add(new DrawHydrogenBond(adeN1, uraN3));
-                printLog.printLogMessage("WARNING: HDB estimated w/o Hydrogen atom!");
+                missingHydrogen=true;
             }
             else
             {
@@ -188,6 +190,7 @@ public class HydrogenBondDetector {
             }
         }
         printLog.printLogMessage("Found HDB between ade "+adeNt.getResIndex()+" and ura "+uraNt.getResIndex());
+        if (missingHydrogen) printLog.printLogMessage("WARNING: HDB was estimated w/o Hydrogen atom!");
         // Store base pairing information in nucleotide classes
         uraNt.setBasePaired(true);
         uraNt.setBasePairedTo(adeNt);
@@ -206,6 +209,8 @@ public class HydrogenBondDetector {
         // Only returned if a stable base pair between gua and cyt
         // is confirmed
         Group hdbGuaCyt = new Group();
+        // Remember if HDB had to be detected without hydrogen atom(s)
+        Boolean missingHydrogen = false;
         // Check first potential hydrogenbond
         // between gua O6 and cyt NH2(4)
         // cyt NH2(4) has two hydrogens: H41 and H42
@@ -226,7 +231,7 @@ public class HydrogenBondDetector {
             if (guaO6.distance(cytN4) <= MAXBONDDISTANCE+1)
             {
                 hdbGuaCyt.getChildren().add(new DrawHydrogenBond(guaO6, cytN4));
-                printLog.printLogMessage("WARNING: HDB estimated w/o Hydrogen atom!");
+                missingHydrogen=true;
             }
             else
             {
@@ -282,7 +287,7 @@ public class HydrogenBondDetector {
             if (guaN1.distance(cytN3) <= MAXBONDDISTANCE+1)
             {
                 hdbGuaCyt.getChildren().add(new DrawHydrogenBond(guaN1, cytN3));
-                printLog.printLogMessage("WARNING: HDB estimated w/o Hydrogen atom!");
+                missingHydrogen=true;
             }
             else
             {
@@ -317,7 +322,7 @@ public class HydrogenBondDetector {
             if (guaN2.distance(cytO2) <= MAXBONDDISTANCE+1)
             {
                 hdbGuaCyt.getChildren().add(new DrawHydrogenBond(guaN2, cytO2));
-                printLog.printLogMessage("WARNING: HDB estimated w/o Hydrogen atom!");
+                missingHydrogen=true;
             }
             else
             {
@@ -352,6 +357,7 @@ public class HydrogenBondDetector {
             }
         }
         printLog.printLogMessage("Found HDB between gua "+guaNt.getResIndex()+" and cyt "+cytNt.getResIndex());
+        if (missingHydrogen) printLog.printLogMessage("WARNING: HDB was estimated w/o Hydrogen atom!");
         // Store base pairing information in nucleotide classes
         guaNt.setBasePaired(true);
         guaNt.setBasePairedTo(cytNt);

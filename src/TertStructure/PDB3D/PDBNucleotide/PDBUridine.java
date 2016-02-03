@@ -128,7 +128,7 @@ public class PDBUridine extends PDBNucleotide
 
     // Return 3D structure. Add connecting lines between individual parts.
     @Override
-    public Group getStructure(BooleanProperty showBackbone, BooleanProperty showSugar, BooleanProperty showBase) {
+    public void getStructure(BooleanProperty showBackbone, BooleanProperty showSugar, BooleanProperty showBase) {
         if (!this.allAtomsDefined()) printLog.printLogMessage("WARNING: Uri_"+this.getResIndex()+" not completely defined.");
         Group uridineGrp = new Group();
         PhongMaterial uriMaterial = new PhongMaterial();
@@ -153,17 +153,17 @@ public class PDBUridine extends PDBNucleotide
         if (pbb.getP() == null)
         {
             uridineGrp.getChildren().addAll(c1toN1);
-            return uridineGrp;
         }
-        // Connect ribose and phosphate
-        DrawLine o5ToP = new DrawLine(ribo.getO5(), pbb.getP());
-        o5ToP.visibleProperty().bind(showSugar.and(showBackbone));
-        uridineGrp.getChildren().addAll(c1toN1, o5ToP);
+        else
+        {
+            // Connect ribose and phosphate
+            DrawLine o5ToP = new DrawLine(ribo.getO5(), pbb.getP());
+            o5ToP.visibleProperty().bind(showSugar.and(showBackbone));
+            uridineGrp.getChildren().addAll(c1toN1, o5ToP);
+        }
         // Add tooltip
-        Tooltip.install(uridineGrp, new Tooltip("Uri_"+this.getResIndex()));
-        uridineGrp.setOnMouseClicked(event -> printLog.printLogMessage("Selected: Uri_"+this.getResIndex()));
-        uridineGrp.setPickOnBounds(true);
-        return uridineGrp;
+        Tooltip.install(this, new Tooltip("Uri_"+this.getResIndex()));
+        this.getChildren().add(uridineGrp);
     }
 
     // Color purin ring according to colormode
@@ -174,8 +174,8 @@ public class PDBUridine extends PDBNucleotide
     {
         switch (colorMode){
             case("resType"):{
-                this.unselected = Color.HOTPINK;
-                this.selected = Color.HOTPINK.invert();
+                this.unselected = Color.web("#c34a41");
+                this.selected = Color.web("#ff0064");
 
             } break;
             case("baseType"):{

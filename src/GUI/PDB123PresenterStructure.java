@@ -68,11 +68,9 @@ public class PDB123PresenterStructure
             // Get PDBNucleotide at current index position
             PDBNucleotide currentNt = ntMap.get(i);
             // Retrieve 3D structure from current PDBNucleotide
-            Group currStructure = currentNt.getStructure(showBackbone, showSugar, showNucleoBase);
-            // Add a Mouse-click event handler to 3D Structure
-            currStructure.setOnMouseClicked(event -> System.out.println("3D Structure clicked"));
+            currentNt.getStructure(showBackbone, showSugar, showNucleoBase);
             // Add 3D structure to 3D subscene
-            structure3D.getChildren().add(currStructure);
+            structure3D.getChildren().add(currentNt);
             // Set the colormode for the 3D structure
             currentNt.setColorMode(colorMode);
 

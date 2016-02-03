@@ -65,7 +65,7 @@ public class PDBCytidine extends PDBNucleotide
     // Return 3D structure. Add connecting lines between individual parts.
     // Visibility of components can be activated/deactivated by user
     @Override
-    public Group getStructure(BooleanProperty showBackbone, BooleanProperty showSugar, BooleanProperty showBase) {
+    public void getStructure(BooleanProperty showBackbone, BooleanProperty showSugar, BooleanProperty showBase) {
         if (!this.allAtomsDefined()) printLog.printLogMessage("WARNING: Cyt_"+this.getResIndex()+" not completely defined.");
         Group cytidineGrp = new Group();
         PhongMaterial cytMaterial = new PhongMaterial();
@@ -91,16 +91,16 @@ public class PDBCytidine extends PDBNucleotide
         if (pbb.getP() == null)
         {
             cytidineGrp.getChildren().addAll(c1toN1);
-            return cytidineGrp;
+
         }
-        // Connect ribose and phosphat
-        DrawLine o5ToP = new DrawLine(ribo.getO5(), pbb.getP());
-        o5ToP.visibleProperty().bind(showSugar.and(showBackbone));
-        cytidineGrp.getChildren().addAll(c1toN1, o5ToP);
-        // Add tooltip
-        Tooltip.install(cytidineGrp, new Tooltip("Cyt_"+this.getResIndex()));
-        cytidineGrp.setOnMouseClicked(event -> printLog.printLogMessage("Selected: Cyt_"+this.getResIndex()));
-        return cytidineGrp;
+        else {
+            // Connect ribose and phosphat
+            DrawLine o5ToP = new DrawLine(ribo.getO5(), pbb.getP());
+            o5ToP.visibleProperty().bind(showSugar.and(showBackbone));
+            cytidineGrp.getChildren().addAll(c1toN1, o5ToP);
+        }
+        Tooltip.install(this, new Tooltip("Cyt_"+this.getResIndex()));
+        this.getChildren().add(cytidineGrp);
     }
 
     // Color purin ring according to colormode
@@ -111,8 +111,8 @@ public class PDBCytidine extends PDBNucleotide
     {
         switch (colorMode){
             case("resType"):{
-                this.unselected = Color.YELLOW;
-                this.selected = Color.YELLOW.invert();
+                this.unselected = Color.web("#cab938");
+                this.selected = Color.web("#caff38");
 
             } break;
             case("baseType"):{

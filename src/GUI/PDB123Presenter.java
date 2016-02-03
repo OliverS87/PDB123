@@ -5,17 +5,24 @@ import PrimStructure.ParsePrimaryStructure;
 import SecStructure.RNA2D.Rna2DEdge;
 import SecStructure.RNA2D.Rna2DGraph;
 import SecStructure.RNA2D.Rna2DNode;
+import SelectionModel.PDB123SelectionModel;
 import TertStructure.PDB3D.PDBNucleotide.PDBNucleotide;;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.geometry.Bounds;
 import javafx.scene.Group;
+import javafx.scene.Node;
 import javafx.scene.PerspectiveCamera;
+import javafx.scene.Scene;
+import javafx.scene.control.Tooltip;
+import javafx.scene.input.PickResult;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 import javafx.scene.transform.Rotate;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import javafx.stage.Window;
 
 import java.io.File;
 import java.io.IOException;
@@ -78,10 +85,10 @@ public class PDB123Presenter {
 
     private void test()
     {
-        for (int i = 0; i <= lastNtIndex; i++) {
-            if (!ntMap.containsKey(i)) continue;
-            ntMap.get(i).setColorMode("baseType");
-        }
+
+
+
+
 
     }
 
@@ -137,6 +144,7 @@ public class PDB123Presenter {
         this.showBackbone = new SimpleBooleanProperty(true);
         this.Node2DList = new ArrayList<>();
         this.Edge2DList = new ArrayList<>();
+        PDB123SelectionModel.initSelectionModel();
     }
 
     // Menu -> exit
@@ -173,7 +181,11 @@ public class PDB123Presenter {
                 // ntMap contains PDBNucleotides (Java representation of PDB 3D coordinates)
                 // and residue index positions
                 Rna123DRepresentation.generate123DRepresentation(firstNtIndex, lastNtIndex, "resType", ntMap, showBackbone, showSugar, showNucleoBase, Node2DList, Edge2DList, PDB123View.getPrimStructure(), PDB123View.getSecDrawings(), PDB123View.getSubScene2D());
-
+                //Stage d3Stage = new Stage();
+                //d3Stage.setTitle("3D Representation");
+                //Scene d3Scene = new Scene(PDB123View.getStack3D(), 600,400);
+                //d3Stage.setScene(d3Scene);
+                //d3Stage.show();
 
 
             } catch (IOException e) {
@@ -193,7 +205,8 @@ public class PDB123Presenter {
     {
         PerspectiveCamera cam = PDB123View.get3DCamera();
         cam.setNearClip(0.0000001);
-        cam.setFarClip(-100000.0);
+        //cam.setFarClip(-100000.0);
+        cam.setFarClip(1000.0);
     }
 
     private void setRotation3D()
