@@ -1,4 +1,4 @@
-package TertStructure.RNAMesh3D;
+package TertStructure.RNA3DComponents;
 
 import javafx.geometry.Point3D;
 import javafx.scene.paint.Color;

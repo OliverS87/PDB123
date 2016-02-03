@@ -7,7 +7,7 @@ import javafx.scene.Group;
 import TertStructure.PDB3D.PDBBackbone.PDBBackbone;
 import TertStructure.PDB3D.PDBNucleobases.PDBCytosine;
 import TertStructure.PDB3D.PDBSugar.PDBRibose;
-import TertStructure.RNAMesh3D.DrawLine;
+import TertStructure.RNA3DComponents.DrawLine;
 import javafx.scene.control.Tooltip;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.PhongMaterial;
@@ -28,13 +28,16 @@ import java.util.Collections;
  * In addition, lines connecting residues and additional atoms can be added.
  * Allows direct access to 5' and 3' end to allow connection of residues in final
  * 3D structure.
- * 3D structure is generated with TertStructure.RNAMesh3D package.
+ * 3D structure is generated with TertStructure.RNA3DComponents package.
  */
 public class PDBCytidine extends PDBNucleotide
 {
     private PDBRibose ribo;
     private PDBCytosine cyt;
     private PDBBackbone pbb;
+    // Set default colors
+    private Color unselected = Color.YELLOW;
+    private Color selected = Color.YELLOW.invert();
 
     public PDBCytidine(PDB123PrintLog log) {
         super(log);
@@ -43,6 +46,7 @@ public class PDBCytidine extends PDBNucleotide
         this.pbb = new PDBBackbone();
         // Keep track of atoms with undefined coordinates
         defAtoms = new ArrayList<>(Collections.nCopies(24, false));
+        this.setNtColor(unselected);
         isSelectedListener();
     }
 
@@ -64,11 +68,14 @@ public class PDBCytidine extends PDBNucleotide
     public Group getStructure(BooleanProperty showBackbone, BooleanProperty showSugar, BooleanProperty showBase) {
         if (!this.allAtomsDefined()) printLog.printLogMessage("WARNING: Cyt_"+this.getResIndex()+" not completely defined.");
         Group cytidineGrp = new Group();
+        PhongMaterial cytMaterial = new PhongMaterial();
         // Build structure for ribose, nucleobase and phosphat backbone
         // Bind visibility of components to showBackbone/showSugar/showBase
-        Group cytidineRibose = this.ribo.getStructure();
+        Group cytidineRibose = this.ribo.getStructure(cytMaterial);
         cytidineRibose.visibleProperty().bind(showSugar);
+        cytMaterial.diffuseColorProperty().bind(this.ntColorProperty());
         Group cytidineNucleobase = this.cyt.getStructure();
+        cyt.setNucleobaseColor(cytMaterial);
         cytidineNucleobase.visibleProperty().bind(showBase);
         Group cytidinePBB = this.pbb.getStructure();
         cytidinePBB.visibleProperty().bind(showBackbone);
@@ -96,22 +103,26 @@ public class PDBCytidine extends PDBNucleotide
         return cytidineGrp;
     }
 
-    // Color pyrimidine ring according to colormode
+    // Color purin ring according to colormode
     // Colormode could be:
     // - Type of residue
     // - Purin or Pyrimidine
-    // - Basepaired?
     public void setColorMode(String colorMode)
     {
         switch (colorMode){
-            case("resType"): cyt.setNucleobaseColor(new PhongMaterial(Color.YELLOW)); break;
-            case("baseType"): cyt.setNucleobaseColor(new PhongMaterial(Color.DARKRED)); break;
-            case("basePaired"): {
-                if (isBasePaired) cyt.setNucleobaseColor(new PhongMaterial(Color.BLACK));
-                else cyt.setNucleobaseColor(new PhongMaterial(Color.WHITE));
-                break;
-            }
+            case("resType"):{
+                this.unselected = Color.YELLOW;
+                this.selected = Color.YELLOW.invert();
+
+            } break;
+            case("baseType"):{
+                this.unselected = Color.DARKRED;
+                this.selected = Color.DARKRED.invert();
+            } break;
+
         }
+        if (isSelectedProperty().getValue()) setNtColor(selected);
+        else setNtColor(unselected);
     }
 
 
@@ -165,17 +176,19 @@ public class PDBCytidine extends PDBNucleotide
 
     }
 
+
+
     // Add listener to react to selection change event
     private void isSelectedListener()
     {
         this.isSelectedProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue)
             {
-                cyt.setNucleobaseColor(new PhongMaterial(Color.YELLOW.invert()));
+                this.setNtColor(selected);
             }
             else
             {
-                cyt.setNucleobaseColor(new PhongMaterial(Color.YELLOW));
+                this.setNtColor(unselected);
             }
         });
     }

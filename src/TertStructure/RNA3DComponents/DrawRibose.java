@@ -1,6 +1,7 @@
-package TertStructure.RNAMesh3D;
+package TertStructure.RNA3DComponents;
 
 import javafx.geometry.Point3D;
+import javafx.scene.paint.PhongMaterial;
 import javafx.scene.shape.MeshView;
 import javafx.scene.shape.TriangleMesh;
 
@@ -57,6 +58,7 @@ public class DrawRibose {
         riboseMesh.getFaces().addAll(faces);
         riboseMesh.getFaceSmoothingGroups().addAll(smoothing);
         MeshView riboseView = new MeshView(riboseMesh);
+
         return riboseView;
     }
 }

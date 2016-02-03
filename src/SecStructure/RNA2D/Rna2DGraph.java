@@ -119,7 +119,6 @@ public class Rna2DGraph {
         // Add elements in list of edges to root2d
         for (Rna2DEdge edge:edge2DList
              ) {
-            System.out.println(edge.toString());
             root2D.getChildren().add(edge);
         }
 

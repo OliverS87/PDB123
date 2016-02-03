@@ -1,13 +1,10 @@
 package TertStructure.PDB3D.PDBBackbone;
 
-import TertStructure.RNAMesh3D.DrawOxygen;
-import TertStructure.RNAMesh3D.DrawPhosphat;
+import TertStructure.RNA3DComponents.DrawOxygen;
+import TertStructure.RNA3DComponents.DrawPhosphat;
 import javafx.geometry.Point3D;
 import javafx.scene.Group;
-import javafx.scene.paint.Color;
-import javafx.scene.paint.PhongMaterial;
-import javafx.scene.shape.Sphere;
-import TertStructure.RNAMesh3D.DrawLine;
+import TertStructure.RNA3DComponents.DrawLine;
 
 /**
  * Created by oliver on 14.12.15.

@@ -64,7 +64,7 @@ public class PDB123Presenter {
         // Set center-button actions
         setCenterButtons();
         // Test function for innovative new moduls
-       //test();
+
 
     }
 
@@ -78,15 +78,10 @@ public class PDB123Presenter {
 
     private void test()
     {
-    Text t1 = new Text("A");
-        Text t2 = new Text("N");
-        t1.setOnMouseClicked(event -> {
-            printLog.printLogMessage("Klappt :-)");
-            t1.setFill(Color.RED);
-
-        });
-        Rectangle r = new Rectangle(t1.getX(), t1.getY(), t1.getStrokeWidth(), t1.getLineSpacing());
-        PDB123View.getPrimStructure().getChildren().addAll(t1,t2, r);
+        for (int i = 0; i <= lastNtIndex; i++) {
+            if (!ntMap.containsKey(i)) continue;
+            ntMap.get(i).setColorMode("baseType");
+        }
 
     }
 
@@ -272,7 +267,7 @@ public class PDB123Presenter {
             if (event.isShiftDown()) {
                 root2D.setScaleX(root2D.getScaleX() + mouseYDelta*0.4);
                 root2D.setScaleY(root2D.getScaleY()+mouseYDelta*0.4);
-                System.out.println("New Scale: "+root2D.getScaleX()+"_"+root2D.getScaleY());
+
             }
             if (event.isControlDown()) {
                 root2D.setTranslateX(root2D.getTranslateX()+mouseXDelta*0.6);

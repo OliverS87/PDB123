@@ -7,9 +7,8 @@ import SecStructure.RNA2D.Rna2DGraph;
 import SecStructure.RNA2D.Rna2DNode;
 import TertStructure.Basepairing.HydrogenBondDetector;
 import TertStructure.PDB3D.PDBNucleotide.PDBNucleotide;
-import TertStructure.RNAMesh3D.DrawLine;
+import TertStructure.RNA3DComponents.DrawLine;
 import javafx.beans.property.BooleanProperty;
-import javafx.geometry.Rectangle2D;
 import javafx.scene.Group;
 import javafx.scene.SubScene;
 import javafx.scene.text.TextFlow;
@@ -82,6 +81,7 @@ public class PDB123PresenterStructure
             // Use arbitrary x/y coordinates. These will be updated at a later stage
             Rna2DNode curr2DNode = new Rna2DNode(0.,0.,2,i, currentNt.isSelectedProperty());
             curr2DNode.identify(currentNt.getType().charAt(0));
+            curr2DNode.fillProperty().bind(currentNt.ntColorProperty());
             rna2DNodes.add(curr2DNode);
             currentNt.setRna2DNode(curr2DNode);
 

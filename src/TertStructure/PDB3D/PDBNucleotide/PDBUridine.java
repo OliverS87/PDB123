@@ -7,7 +7,7 @@ import javafx.scene.Group;
 import TertStructure.PDB3D.PDBBackbone.PDBBackbone;
 import TertStructure.PDB3D.PDBNucleobases.PDBUracil;
 import TertStructure.PDB3D.PDBSugar.PDBRibose;
-import TertStructure.RNAMesh3D.DrawLine;
+import TertStructure.RNA3DComponents.DrawLine;
 import javafx.scene.control.Tooltip;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.PhongMaterial;
@@ -28,13 +28,15 @@ import java.util.Collections;
  * In addition, lines connecting residues and additional atoms can be added.
  * Allows direct access to 5' and 3' end to allow connection of residues in final
  * 3D structure.
- * 3D structure is generated with TertStructure.RNAMesh3D package.
+ * 3D structure is generated with TertStructure.RNA3DComponents package.
  */
 public class PDBUridine extends PDBNucleotide
 {
     private PDBRibose ribo;
     private PDBUracil uri;
     private PDBBackbone pbb;
+    private Color unselected = Color.HOTPINK;
+    private Color selected = Color.HOTPINK.invert();
 
     public PDBUridine(PDB123PrintLog log) {
         super(log);
@@ -42,6 +44,7 @@ public class PDBUridine extends PDBNucleotide
         this.uri = new PDBUracil();
         this.pbb = new PDBBackbone();
         defAtoms = new ArrayList<>(Collections.nCopies(23, false));
+        this.setNtColor(unselected);
         isSelectedListener();
     }
 
@@ -113,11 +116,11 @@ public class PDBUridine extends PDBNucleotide
         this.isSelectedProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue)
             {
-                uri.setNucleobaseColor(new PhongMaterial(Color.HOTPINK.invert()));
+                this.setNtColor(selected);
             }
             else
             {
-                uri.setNucleobaseColor(new PhongMaterial(Color.HOTPINK));
+                this.setNtColor(unselected);
             }
         });
     }
@@ -128,9 +131,12 @@ public class PDBUridine extends PDBNucleotide
     public Group getStructure(BooleanProperty showBackbone, BooleanProperty showSugar, BooleanProperty showBase) {
         if (!this.allAtomsDefined()) printLog.printLogMessage("WARNING: Uri_"+this.getResIndex()+" not completely defined.");
         Group uridineGrp = new Group();
-        Group uridineSugar = this.ribo.getStructure();
+        PhongMaterial uriMaterial = new PhongMaterial();
+        Group uridineSugar = this.ribo.getStructure(uriMaterial);
         uridineSugar.visibleProperty().bind(showSugar);
+        uriMaterial.diffuseColorProperty().bind(this.ntColorProperty());
         Group uridineNucleobase =this.uri.getStructure();
+        uri.setNucleobaseColor(uriMaterial);
         uridineNucleobase.visibleProperty().bind(showBase);
         Group uridinePBB = this.pbb.getStructure();
         uridinePBB.visibleProperty().bind(showBackbone);
@@ -160,22 +166,26 @@ public class PDBUridine extends PDBNucleotide
         return uridineGrp;
     }
 
-    // Color pyrimidine ring according to colormode
+    // Color purin ring according to colormode
     // Colormode could be:
     // - Type of residue
     // - Purin or Pyrimidine
-    // - Basepaired?
     public void setColorMode(String colorMode)
     {
         switch (colorMode){
-            case("resType"): uri.setNucleobaseColor(new PhongMaterial(Color.HOTPINK)); break;
-            case("baseType"): uri.setNucleobaseColor(new PhongMaterial(Color.DARKRED)); break;
-            case("basePaired"): {
-                if (isBasePaired) uri.setNucleobaseColor(new PhongMaterial(Color.BLACK));
-                else uri.setNucleobaseColor(new PhongMaterial(Color.WHITE));
-                break;
-            }
+            case("resType"):{
+                this.unselected = Color.HOTPINK;
+                this.selected = Color.HOTPINK.invert();
+
+            } break;
+            case("baseType"):{
+                this.unselected = Color.DARKRED;
+                this.selected = Color.DARKRED.invert();
+            } break;
+
         }
+        if (isSelectedProperty().getValue()) setNtColor(selected);
+        else setNtColor(unselected);
     }
 
     @Override

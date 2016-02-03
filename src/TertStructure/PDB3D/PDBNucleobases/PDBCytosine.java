@@ -1,6 +1,6 @@
 package TertStructure.PDB3D.PDBNucleobases;
 
-import TertStructure.RNAMesh3D.*;
+import TertStructure.RNA3DComponents.*;
 import javafx.geometry.Point3D;
 import javafx.scene.Group;
 

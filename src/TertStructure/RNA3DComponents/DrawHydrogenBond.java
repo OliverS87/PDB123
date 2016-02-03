@@ -1,4 +1,4 @@
-package TertStructure.RNAMesh3D;
+package TertStructure.RNA3DComponents;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;

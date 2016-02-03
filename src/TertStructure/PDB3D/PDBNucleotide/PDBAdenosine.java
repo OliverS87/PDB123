@@ -7,8 +7,7 @@ import javafx.scene.Group;
 import TertStructure.PDB3D.PDBBackbone.PDBBackbone;
 import TertStructure.PDB3D.PDBNucleobases.PDBAdenine;
 import TertStructure.PDB3D.PDBSugar.PDBRibose;
-import TertStructure.RNAMesh3D.DrawLine;
-import javafx.scene.control.Tooltip;
+import TertStructure.RNA3DComponents.DrawLine;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.PhongMaterial;
 
@@ -28,14 +27,16 @@ import java.util.Collections;
  * In addition, lines connecting residues and additional atoms can be added.
  * Allows direct access to 5' and 3' end to allow connection of residues in final
  * 3D structure.
- * 3D structure is generated with TertStructure.RNAMesh3D package.
+ * 3D structure is generated with TertStructure.RNA3DComponents package.
  */
 public class PDBAdenosine extends PDBNucleotide
 {
     private PDBRibose ribo;
     private PDBAdenine ade;
     private PDBBackbone pbb;
-
+    // Set default colors
+    private Color unselected = Color.DARKGREEN;
+    private Color selected = Color.DARKGREEN.invert();
 
 
     public PDBAdenosine(PDB123PrintLog log) {
@@ -45,6 +46,7 @@ public class PDBAdenosine extends PDBNucleotide
         this.pbb = new PDBBackbone();
         // Keep track of atoms with undefined coordinates
         defAtoms = new ArrayList<>(Collections.nCopies(26, false));
+        this.setNtColor(unselected);
         isSelectedListener();
     }
 
@@ -75,11 +77,14 @@ public class PDBAdenosine extends PDBNucleotide
     public Group getStructure(BooleanProperty showBackbone, BooleanProperty showSugar, BooleanProperty showBase) {
         if (!this.allAtomsDefined()) printLog.printLogMessage("WARNING: Ade_"+this.getResIndex()+" not completely defined.");
         Group adenosineGrp = new Group();
+        PhongMaterial adeMaterial = new PhongMaterial();
+        adeMaterial.diffuseColorProperty().bind(this.ntColorProperty());
         // Build structure for ribose, nucleobase and phosphat backbone
         // Bind visibility of components to showBackbone/showSugar/showBase
-        Group adenosineRibose = this.ribo.getStructure();
+        Group adenosineRibose = this.ribo.getStructure(adeMaterial);
         adenosineRibose.visibleProperty().bind(showSugar);
         Group adenosineNucleoBase = this.ade.getStructure();
+        ade.setNucleobaseColor(adeMaterial);
         adenosineNucleoBase.visibleProperty().bind(showBase);
         Group adenosinePPB = this.pbb.getStructure();
         adenosinePPB.visibleProperty().bind(showBackbone);
@@ -106,18 +111,21 @@ public class PDBAdenosine extends PDBNucleotide
     // Colormode could be:
     // - Type of residue
     // - Purin or Pyrimidine
-    // - Basepaired?
     public void setColorMode(String colorMode)
     {
         switch (colorMode){
-            case("resType"): ade.setNucleobaseColor(new PhongMaterial(Color.DARKGREEN)); break;
-            case("baseType"): ade.setNucleobaseColor(new PhongMaterial(Color.DARKBLUE)); break;
-            case("basePaired"): {
-                if (isBasePaired) ade.setNucleobaseColor(new PhongMaterial(Color.BLACK));
-                else ade.setNucleobaseColor(new PhongMaterial(Color.WHITE));
-                break;
-            }
+            case("resType"):{
+                this.unselected = Color.DARKGREEN;
+                this.selected = Color.DARKGREEN.invert();
+
+            } break;
+            case("baseType"):{
+                this.unselected = Color.DARKBLUE;
+                this.selected = Color.DARKBLUE.invert();
+            } break;
         }
+        if (isSelectedProperty().getValue()) setNtColor(selected);
+        else setNtColor(unselected);
     }
     // SetAtom converts the PDB raw input into accesible Java Points3D coordinates
     @Override
@@ -160,16 +168,17 @@ public class PDBAdenosine extends PDBNucleotide
 
     }
 
+    // Add listener to react to selection change event
     private void isSelectedListener()
     {
         this.isSelectedProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue)
             {
-                ade.setNucleobaseColor(new PhongMaterial(Color.DARKGREEN.invert()));
+                this.setNtColor(selected);
             }
             else
             {
-                ade.setNucleobaseColor(new PhongMaterial(Color.DARKGREEN));
+                this.setNtColor(unselected);
             }
         });
     }

@@ -2,14 +2,17 @@ package TertStructure.PDB3D.PDBNucleotide;
 
 import GUI.PDB123PrintLog;
 import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.geometry.Point3D;
 import javafx.scene.Group;
 import TertStructure.PDB3D.PDBBackbone.PDBBackbone;
 import TertStructure.PDB3D.PDBNucleobases.PDBGuanine;
 import TertStructure.PDB3D.PDBSugar.PDBRibose;
-import TertStructure.RNAMesh3D.DrawLine;
+import TertStructure.RNA3DComponents.DrawLine;
 import javafx.scene.control.Tooltip;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
 import javafx.scene.paint.PhongMaterial;
 
 import java.util.ArrayList;
@@ -28,13 +31,18 @@ import java.util.Collections;
  * In addition, lines connecting residues and additional atoms can be added.
  * Allows direct access to 5' and 3' end to allow connection of residues in final
  * 3D structure.
- *  3D structure is generated with TertStructure.RNAMesh3D package.
+ *  3D structure is generated with TertStructure.RNA3DComponents package.
  */
 public class PDBGuanosine extends PDBNucleotide
 {
     private PDBRibose ribo;
     private PDBGuanine gua;
     private PDBBackbone pbb;
+    // Set default colors
+    private Color unselected = Color.CYAN;
+    private Color selected = Color.CYAN.invert();
+
+
 
     public PDBGuanosine(PDB123PrintLog log) {
         super(log);
@@ -42,6 +50,7 @@ public class PDBGuanosine extends PDBNucleotide
         this.gua = new PDBGuanine();
         this.pbb = new PDBBackbone();
         defAtoms = new ArrayList<>(Collections.nCopies(27, false));
+        this.setNtColor(unselected);
         isSelectedListener();
     }
 
@@ -117,11 +126,11 @@ public class PDBGuanosine extends PDBNucleotide
         this.isSelectedProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue)
             {
-                gua.setNucleobaseColor(new PhongMaterial(Color.CYAN.invert()));
+                this.setNtColor(selected);
             }
             else
             {
-                gua.setNucleobaseColor(new PhongMaterial(Color.CYAN));
+                this.setNtColor(unselected);
             }
         });
     }
@@ -134,9 +143,12 @@ public class PDBGuanosine extends PDBNucleotide
         Group guanosineGrp = new Group();
         // Build structure for ribose, nucleobase and phosphat backbone
         // Bind visibility of components to showBackbone/showSugar/showBase
-        Group guanosineSugar = this.ribo.getStructure();
+        PhongMaterial guaMaterial = new PhongMaterial();
+        Group guanosineSugar = this.ribo.getStructure(guaMaterial);
         guanosineSugar.visibleProperty().bind(showSugar);
+        guaMaterial.diffuseColorProperty().bind(this.ntColorProperty());
         Group guanosineBase = this.gua.getStructure();
+        gua.setNucleobaseColor(guaMaterial);
         guanosineBase.visibleProperty().bind(showBase);
         Group guanosinePBB = this.pbb.getStructure();
         guanosinePBB.visibleProperty().bind(showBackbone);
@@ -164,18 +176,22 @@ public class PDBGuanosine extends PDBNucleotide
     // Colormode could be:
     // - Type of residue
     // - Purin or Pyrimidine
-    // - Future: Basepaired?
     public void setColorMode(String colorMode)
     {
         switch (colorMode){
-            case("resType"): gua.setNucleobaseColor(new PhongMaterial(Color.CYAN)); break;
-            case("baseType"): gua.setNucleobaseColor(new PhongMaterial(Color.DARKBLUE)); break;
-            case("basePaired"): {
-                if (isBasePaired) gua.setNucleobaseColor(new PhongMaterial(Color.BLACK));
-                else gua.setNucleobaseColor(new PhongMaterial(Color.WHITE));
-                break;
-            }
+            case("resType"):{
+                this.unselected = Color.CYAN;
+                this.selected = Color.CYAN.invert();
+
+            } break;
+            case("baseType"):{
+                this.unselected = Color.DARKBLUE;
+                this.selected = Color.DARKBLUE.invert();
+            } break;
+
         }
+        if (isSelectedProperty().getValue()) setNtColor(selected);
+        else setNtColor(unselected);
     }
 
     @Override

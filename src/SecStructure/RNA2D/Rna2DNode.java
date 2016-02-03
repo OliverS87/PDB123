@@ -19,10 +19,10 @@ public class Rna2DNode extends Circle
     private SimpleDoubleProperty posX = new SimpleDoubleProperty();
     private SimpleDoubleProperty posY = new SimpleDoubleProperty();
     private BooleanProperty isSelected;
-   // private SimpleDoubleProperty radius = new SimpleDoubleProperty();
+
     // Index of node in structure
     private int nodeNr;
-    private Color ntColor;
+
 
     public Rna2DNode(Double posX, Double posY, double radius, int nodeNr, BooleanProperty isSelected) {
         this.posX.setValue(posX);
@@ -42,12 +42,12 @@ public class Rna2DNode extends Circle
         isSelected.addListener((observable, oldValue, newValue) -> {
             if (newValue)
             {
-                this.setFill(ntColor.invert());
+
                 this.setRadius(this.getRadius()*1.2);
             }
             if (!newValue)
             {
-                this.setFill(ntColor);
+
                 this.setRadius(this.getRadius()/1.2);
             }
         });
@@ -73,7 +73,7 @@ public class Rna2DNode extends Circle
         return nodeNr;
     }
 
-    // Set color + tooltip according to associated character
+    // Set tooltip according to associated character
     public void identify(char nucleotide)
     {
         String ntId;
@@ -81,34 +81,33 @@ public class Rna2DNode extends Circle
         switch (nucleotide) {
             case ('A'):
                 ntId = "Adenine";
-                ntColor = Color.DARKGREEN;
+
                 break;
             case ('C'):
                 ntId = "Cytosine";
-                ntColor = Color.YELLOW;
+
                 break;
             case ('G'):
                 ntId = "Guanine";
-                ntColor = Color.CYAN;
+
                 break;
             case ('T'):
                 ntId = "Thymine";
-                ntColor = Color.HOTPINK;
+
                 break;
             case ('U'):
                 ntId = "Uracile";
-                ntColor = Color.HOTPINK;
+
                 break;
             default:
                 ntId = "Nucleotide";
-                ntColor = Color.FLORALWHITE;
+
         }
         Tooltip.install(this, new Tooltip(ntId + " " + nodeNr));
         this.setOnMouseClicked(event -> {
-            System.out.println("node click");
             isSelected.setValue(!isSelected.getValue());
         });
-        this.setFill(ntColor);
+
     }
 
 

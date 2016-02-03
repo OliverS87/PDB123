@@ -13,19 +13,20 @@ import java.util.Map;
  */
 public class ParsePrimaryStructure
 {
-    public String parseRnaSeq(Map<Integer, PDBNucleotide> ntMap, int firstNtIndex, int lastNtIndex, TextFlow textFlow)
+    public void parseRnaSeq(Map<Integer, PDBNucleotide> ntMap, int firstNtIndex, int lastNtIndex, TextFlow textFlow)
     {
-        StringBuffer sb = new StringBuffer(lastNtIndex);
+      //  StringBuffer sb = new StringBuffer(lastNtIndex);
         for (int i = firstNtIndex; i <= lastNtIndex; i++)
         {
             if (ntMap.containsKey(i))
             {
                 PDBNucleotide currNt = ntMap.get(i);
-                sb.append(currNt.getType());
+              //  sb.append(currNt.getType());
                 NucleotideLetter currLetter = new NucleotideLetter(currNt.getType(), currNt.isSelectedProperty(), i);
+                currLetter.fillProperty().bind(currNt.ntColorProperty());
                 textFlow.getChildren().add(currLetter);
             }
         }
-        return sb.toString();
+
     }
 }

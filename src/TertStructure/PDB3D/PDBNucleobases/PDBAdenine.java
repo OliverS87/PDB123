@@ -1,11 +1,11 @@
 package TertStructure.PDB3D.PDBNucleobases;
 
-import TertStructure.RNAMesh3D.DrawHydrogen;
-import TertStructure.RNAMesh3D.DrawLine;
-import TertStructure.RNAMesh3D.DrawNitrogen;
+import TertStructure.RNA3DComponents.DrawHydrogen;
+import TertStructure.RNA3DComponents.DrawLine;
+import TertStructure.RNA3DComponents.DrawNitrogen;
 import javafx.geometry.Point3D;
 import javafx.scene.Group;
-import TertStructure.RNAMesh3D.DrawPurin;
+import TertStructure.RNA3DComponents.DrawPurin;
 
 /**
  * Created by oliver on 14.12.15.

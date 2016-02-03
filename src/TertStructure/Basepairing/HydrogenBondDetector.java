@@ -3,7 +3,7 @@ package TertStructure.Basepairing;
 import GUI.PDB123PrintLog;
 import SecStructure.RNA2D.Rna2DEdge;
 import TertStructure.PDB3D.PDBNucleotide.*;
-import TertStructure.RNAMesh3D.DrawHydrogenBond;
+import TertStructure.RNA3DComponents.DrawHydrogenBond;
 import javafx.geometry.Point3D;
 import javafx.scene.Group;
 
@@ -108,41 +108,50 @@ public class HydrogenBondDetector {
         Point3D adeH62 = adeNt.getAdenine().getH62();
         Point3D adeN6 = adeNt.getAdenine().getN6();
         Point3D uraO4 = uraNt.getUracil().getO4();
-        // Exit here if any position is undefined
-        if (adeH61==null || adeH62 ==null || adeN6 ==null || uraO4 == null)
+        // Exit here if Donor Atom positions are undefined
+        if (adeN6 ==null || uraO4 == null)
         {
             return null;
         }
-        // First case: ade H61 closer to ura O4 than ade H62
-        if (adeH61.distance(uraO4) <= adeH62.distance(uraO4))
+       // If protons are not defined, look at the distance between adeN6 and uraO4
+        // Add 1 Angstrom to max. allowed distance
+        else if (adeH61==null || adeH62 ==null)
         {
-            // Check hydrogen bond angle between ade H61 and ura O4
-            if ((adeH61.distance(uraO4) <= MAXBONDDISTANCE) && (adeH61.angle(adeN6,uraO4) >= MINBONDANGLE))
+            if (adeN6.distance(uraO4) <= MAXBONDDISTANCE+1)
             {
-                // angle is large enough to allow stable HDB
-                hdbAdeUra.getChildren().add(new DrawHydrogenBond(adeH61, uraO4));
+                hdbAdeUra.getChildren().add(new DrawHydrogenBond(adeN6, uraO4));
+                printLog.printLogMessage("WARNING: HDB estimated w/o Hydrogen atom!");
             }
             else
             {
-                // If angle is not large enough for stable HDB,
-                // return null object
-                return null;
+                return  null;
             }
+
         }
-        // Alternative case: ade H62 closer to ura O4 than ade H61
-        if (adeH61.distance(uraO4) > adeH62.distance(uraO4))
-        {
-            // Check hydrogen bond angle between ade H62 and ura O4
-            if ((adeH62.distance(uraO4) <= MAXBONDDISTANCE)&&(adeH62.angle(adeN6,uraO4) >= MINBONDANGLE))
-            {
-                // angle is large enough to allow stable HDB
-                hdbAdeUra.getChildren().add(new DrawHydrogenBond(adeH62, uraO4));
+        else {
+            // First case: ade H61 closer to ura O4 than ade H62
+            if (adeH61.distance(uraO4) <= adeH62.distance(uraO4)) {
+                // Check hydrogen bond angle between ade H61 and ura O4
+                if ((adeH61.distance(uraO4) <= MAXBONDDISTANCE) && (adeH61.angle(adeN6, uraO4) >= MINBONDANGLE)) {
+                    // angle is large enough to allow stable HDB
+                    hdbAdeUra.getChildren().add(new DrawHydrogenBond(adeH61, uraO4));
+                } else {
+                    // If angle is not large enough for stable HDB,
+                    // return null object
+                    return null;
+                }
             }
-            else
-            {
-                // If angle is not large enough for stable HDB,
-                // return null object
-                return null;
+            // Alternative case: ade H62 closer to ura O4 than ade H61
+            if (adeH61.distance(uraO4) > adeH62.distance(uraO4)) {
+                // Check hydrogen bond angle between ade H62 and ura O4
+                if ((adeH62.distance(uraO4) <= MAXBONDDISTANCE) && (adeH62.angle(adeN6, uraO4) >= MINBONDANGLE)) {
+                    // angle is large enough to allow stable HDB
+                    hdbAdeUra.getChildren().add(new DrawHydrogenBond(adeH62, uraO4));
+                } else {
+                    // If angle is not large enough for stable HDB,
+                    // return null object
+                    return null;
+                }
             }
         }
         // Check second potential HDB
@@ -150,18 +159,33 @@ public class HydrogenBondDetector {
         Point3D adeN1 = adeNt.getAdenine().getN1();
         Point3D uraN3 = uraNt.getUracil().getN3();
         Point3D uraH3 = uraNt.getUracil().getH3();
-        // Exit here if any position is undefined
-        if (adeN1==null || uraN3 ==null || uraH3 ==null)
+        // Exit here if any donor position is undefined
+        if (adeN1==null || uraN3 ==null)
         {
             return null;
         }
-        if ((uraH3.distance(adeN1) <= MAXBONDDISTANCE) && uraH3.angle(adeN1, uraN3) >= MINBONDANGLE)
+        // If protons are not defined, look at the distance between adeN1 and uraN3
+        // Add 1 Angstrom to max. allowed distance
+        else if(uraH3 ==null)
         {
-            hdbAdeUra.getChildren().add(new DrawHydrogenBond(adeN1, uraH3));
+            if (adeN1.distance(uraN3) <= MAXBONDDISTANCE+1)
+            {
+                hdbAdeUra.getChildren().add(new DrawHydrogenBond(adeN1, uraN3));
+                printLog.printLogMessage("WARNING: HDB estimated w/o Hydrogen atom!");
+            }
+            else
+            {
+                return  null;
+            }
+
         }
         else
         {
-            return null;
+            if ((uraH3.distance(adeN1) <= MAXBONDDISTANCE) && uraH3.angle(adeN1, uraN3) >= MINBONDANGLE) {
+                hdbAdeUra.getChildren().add(new DrawHydrogenBond(adeN1, uraH3));
+            } else {
+                return null;
+            }
         }
         printLog.printLogMessage("Found HDB between ade "+adeNt.getResIndex()+" and ura "+uraNt.getResIndex());
         // Store base pairing information in nucleotide classes
@@ -190,27 +214,40 @@ public class HydrogenBondDetector {
         Point3D cytN4 = cytNt.getCytosine().getN4();
         Point3D cytH41 = cytNt.getCytosine().getH41();
         Point3D cytH42 = cytNt.getCytosine().getH42();
-        // Exit here if any position is undefined
-        if (guaO6==null || cytN4 ==null || cytH41 ==null|| cytH42 ==null)
+        // Exit here if any donor position is undefined
+        if (guaO6==null || cytN4 ==null)
         {
             return null;
         }
-        // First case: cyt H41 closer to gua O6 than cyt H42
-        if (cytH41.distance(guaO6) <= cytH42.distance(guaO6))
+        // If protons are not defined, look at the distance between guaO6 and cytN4
+        // Add 1 Angstrom to max. allowed distance
+        else if (cytH41 ==null|| cytH42 ==null)
         {
-            // Check hydrogen bond angle between cyt H41 and gua O6
-            if ((cytH41.distance(guaO6) <= MAXBONDDISTANCE) && (cytH41.angle(cytN4,guaO6) >= MINBONDANGLE))
+            if (guaO6.distance(cytN4) <= MAXBONDDISTANCE+1)
             {
-                // angle is large enough to allow stable HDB
-                hdbGuaCyt.getChildren().add(new DrawHydrogenBond(cytH41, guaO6));
+                hdbGuaCyt.getChildren().add(new DrawHydrogenBond(guaO6, cytN4));
+                printLog.printLogMessage("WARNING: HDB estimated w/o Hydrogen atom!");
             }
             else
             {
-                // If angle is not large enough for stable HDB,
-                // return null object
-                return null;
+                return  null;
             }
         }
+        else
+        {
+            // First case: cyt H41 closer to gua O6 than cyt H42
+            if (cytH41.distance(guaO6) <= cytH42.distance(guaO6)) {
+                // Check hydrogen bond angle between cyt H41 and gua O6
+                if ((cytH41.distance(guaO6) <= MAXBONDDISTANCE) && (cytH41.angle(cytN4, guaO6) >= MINBONDANGLE)) {
+                    // angle is large enough to allow stable HDB
+                    hdbGuaCyt.getChildren().add(new DrawHydrogenBond(cytH41, guaO6));
+                } else {
+                    // If angle is not large enough for stable HDB,
+                    // return null object
+                    return null;
+                }
+            }
+
         // Alternative case: cyt H42 closer to gua O6 than cyt H41
         if (cytH41.distance(guaO6) > cytH42.distance(guaO6))
         {
@@ -227,23 +264,38 @@ public class HydrogenBondDetector {
                 return null;
             }
         }
+        }
         // Check second potential hydrogenbond
         // between gua N1 and cyt N3
         Point3D guaN1 = guaNt.getGuanine().getN1();
         Point3D guaH1 = guaNt.getGuanine().getH1();
         Point3D cytN3 = cytNt.getCytosine().getN3();
-        // Exit here if any position is undefined
-        if (guaN1==null || guaH1 ==null || cytN3 ==null)
+        // Exit here if any donor position is undefined
+        if (guaN1==null || cytN3 ==null)
         {
             return null;
         }
-        if ((guaH1.distance(cytN3) <= MAXBONDDISTANCE) && guaH1.angle(guaN1, cytN3) >= MINBONDANGLE)
+        // If protons are not defined, look at the distance between guaN1 and cytN3
+        // Add 1 Angstrom to max. allowed distance
+        else if (guaH1 ==null)
         {
-            hdbGuaCyt.getChildren().add(new DrawHydrogenBond(guaH1, cytN3));
+            if (guaN1.distance(cytN3) <= MAXBONDDISTANCE+1)
+            {
+                hdbGuaCyt.getChildren().add(new DrawHydrogenBond(guaN1, cytN3));
+                printLog.printLogMessage("WARNING: HDB estimated w/o Hydrogen atom!");
+            }
+            else
+            {
+                return  null;
+            }
         }
         else
         {
-            return null;
+            if ((guaH1.distance(cytN3) <= MAXBONDDISTANCE) && guaH1.angle(guaN1, cytN3) >= MINBONDANGLE) {
+                hdbGuaCyt.getChildren().add(new DrawHydrogenBond(guaH1, cytN3));
+            } else {
+                return null;
+            }
         }
         // Check third potential hydrogenbond
         // between gua NH2(2) and cyt O2
@@ -253,41 +305,50 @@ public class HydrogenBondDetector {
         Point3D guaH21 = guaNt.getGuanine().getH21();
         Point3D guaH22 = guaNt.getGuanine().getH22();
         Point3D cytO2 = cytNt.getCytosine().getO2();
-        // Exit here if any position is undefined
-        if (guaN2==null || guaH21 ==null || guaH22 ==null|| cytO2 ==null)
+        // Exit here if any donor position is undefined
+        if (guaN2==null || cytO2 ==null)
         {
             return null;
         }
-        // First case: gua H21 closer to cyt O2 than gua H22
-        if (guaH21.distance(cytO2) <= guaH22.distance(cytO2))
+        // If protons are not defined, look at the distance between guaN2 and cytO2
+        // Add 1 Angstrom to max. allowed distance
+        if (guaH21 ==null || guaH22 ==null)
         {
-            // Check hydrogen bond angle between gua H21 and cyt O2
-            if ((guaH21.distance(cytO2) <= MAXBONDDISTANCE) && (guaH21.angle(guaN2,cytO2) >= MINBONDANGLE))
+            if (guaN2.distance(cytO2) <= MAXBONDDISTANCE+1)
             {
-                // angle is large enough to allow stable HDB
-                hdbGuaCyt.getChildren().add(new DrawHydrogenBond(guaH21, cytO2));
+                hdbGuaCyt.getChildren().add(new DrawHydrogenBond(guaN2, cytO2));
+                printLog.printLogMessage("WARNING: HDB estimated w/o Hydrogen atom!");
             }
             else
             {
-                // If angle is not large enough for stable HDB,
-                // return null object
-                return null;
+                return  null;
             }
         }
-        // Alternative case: gua H22 closer to cyt O2 than gua H21
-        if (guaH21.distance(cytO2) > guaH22.distance(cytO2))
+        else
         {
-            // Check hydrogen bond angle between gua H22 and cyt O2
-            if ((guaH22.distance(cytO2) <= MAXBONDDISTANCE) && (guaH22.angle(guaN2,cytO2) >= MINBONDANGLE))
-            {
-                // angle is large enough to allow stable HDB
-                hdbGuaCyt.getChildren().add(new DrawHydrogenBond(guaH22, cytO2));
+            // First case: gua H21 closer to cyt O2 than gua H22
+            if (guaH21.distance(cytO2) <= guaH22.distance(cytO2)) {
+                // Check hydrogen bond angle between gua H21 and cyt O2
+                if ((guaH21.distance(cytO2) <= MAXBONDDISTANCE) && (guaH21.angle(guaN2, cytO2) >= MINBONDANGLE)) {
+                    // angle is large enough to allow stable HDB
+                    hdbGuaCyt.getChildren().add(new DrawHydrogenBond(guaH21, cytO2));
+                } else {
+                    // If angle is not large enough for stable HDB,
+                    // return null object
+                    return null;
+                }
             }
-            else
-            {
-                // If angle is not large enough for stable HDB,
-                // return null object
-                return null;
+            // Alternative case: gua H22 closer to cyt O2 than gua H21
+            if (guaH21.distance(cytO2) > guaH22.distance(cytO2)) {
+                // Check hydrogen bond angle between gua H22 and cyt O2
+                if ((guaH22.distance(cytO2) <= MAXBONDDISTANCE) && (guaH22.angle(guaN2, cytO2) >= MINBONDANGLE)) {
+                    // angle is large enough to allow stable HDB
+                    hdbGuaCyt.getChildren().add(new DrawHydrogenBond(guaH22, cytO2));
+                } else {
+                    // If angle is not large enough for stable HDB,
+                    // return null object
+                    return null;
+                }
             }
         }
         printLog.printLogMessage("Found HDB between gua "+guaNt.getResIndex()+" and cyt "+cytNt.getResIndex());

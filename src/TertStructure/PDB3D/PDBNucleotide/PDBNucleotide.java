@@ -4,9 +4,12 @@ import GUI.PDB123PrintLog;
 import SecStructure.RNA2D.Rna2DNode;
 import TertStructure.PDB3D.PDBSugar.PDBRibose;
 import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.geometry.Point3D;
 import javafx.scene.Group;
+import javafx.scene.paint.Color;
 
 import java.util.ArrayList;
 
@@ -18,6 +21,7 @@ import java.util.ArrayList;
  */
 public abstract class PDBNucleotide {
     private int resIndex;
+    private ObjectProperty<Color> ntColor = new SimpleObjectProperty<>();
     private Rna2DNode rna2DNode;
     private BooleanProperty isSelected = new SimpleBooleanProperty(false);
     PDB123PrintLog printLog;
@@ -67,5 +71,13 @@ public abstract class PDBNucleotide {
 
     public void setRna2DNode(Rna2DNode rna2DNode) {
         this.rna2DNode = rna2DNode;
+    }
+
+    public void setNtColor(Color ntColor) {
+        this.ntColor.set(ntColor);
+    }
+
+    public ObjectProperty<Color> ntColorProperty() {
+        return ntColor;
     }
 }

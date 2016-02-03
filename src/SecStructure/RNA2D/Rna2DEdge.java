@@ -19,10 +19,9 @@ public class Rna2DEdge extends Line
         this.startYProperty().bind(n1.posYProperty());
         this.endXProperty().bind(n2.posXProperty());
         this.endYProperty().bind(n2.posYProperty());
-       // onSelection();
-        //selectionListener();
+
     }
-    // Covalent bonds are white, non-covalent red
+    // Covalent bonds are black, non-covalent blue
     public void setEdgeStyle(String style)
     {
         switch (style)

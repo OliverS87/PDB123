@@ -1,20 +1,19 @@
 package TertStructure.PDB3D.PDBSugar;
 
-import TertStructure.RNAMesh3D.DrawCarbon;
-import TertStructure.RNAMesh3D.DrawOxygen;
+import TertStructure.RNA3DComponents.DrawCarbon;
+import TertStructure.RNA3DComponents.DrawOxygen;
 import javafx.geometry.Point3D;
 import javafx.scene.Group;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.PhongMaterial;
 import javafx.scene.shape.MeshView;
-import javafx.scene.shape.Sphere;
-import TertStructure.RNAMesh3D.DrawLine;
-import TertStructure.RNAMesh3D.DrawRibose;
+import TertStructure.RNA3DComponents.DrawLine;
+import TertStructure.RNA3DComponents.DrawRibose;
 
 /**
  * Created by oliver on 15.12.15.
  * PDB123StartUp class for representation of ribose PDB coordinates.
- * Returns 3D structure generated with TertStructure.RNAMesh3D package.
+ * Returns 3D structure generated with TertStructure.RNA3DComponents package.
  */
 public class PDBRibose
 {
@@ -95,13 +94,13 @@ public class PDBRibose
     // Group all 3D elements and return as Group
     // Group contains 3D mesh structure of ribose ring and additional atoms and
     // connecting lines
-    public Group getStructure()
+    public Group getStructure(PhongMaterial riboMaterial)
     {
         // Draw ribose
         Group riboseGrp = new Group();
         DrawRibose drawRibose = new DrawRibose(this.getC1(), this.getC2(), this.getC3(), this.getC4(), this.getO4());
         MeshView riboseMesh = drawRibose.getRibose();
-        riboseMesh.setMaterial(new PhongMaterial(Color.BURLYWOOD));
+        riboseMesh.setMaterial(riboMaterial);
         riboseGrp.getChildren().add(riboseMesh);
         // Draw connected C5 and O5
         DrawCarbon carbon5 = new DrawCarbon(C5);
