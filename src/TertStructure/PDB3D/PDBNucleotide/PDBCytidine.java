@@ -1,6 +1,7 @@
 package TertStructure.PDB3D.PDBNucleotide;
 
 import GUI.PDB123PrintLog;
+import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
 import javafx.geometry.Point3D;
 import javafx.scene.Group;
@@ -35,9 +36,7 @@ public class PDBCytidine extends PDBNucleotide
     private PDBRibose ribo;
     private PDBCytosine cyt;
     private PDBBackbone pbb;
-    // Set default colors
-    private Color unselected = Color.YELLOW;
-    private Color selected = Color.YELLOW.invert();
+    private Color unselected, selected;
 
     public PDBCytidine(PDB123PrintLog log) {
         super(log);
@@ -46,8 +45,6 @@ public class PDBCytidine extends PDBNucleotide
         this.pbb = new PDBBackbone();
         // Keep track of atoms with undefined coordinates
         defAtoms = new ArrayList<>(Collections.nCopies(24, false));
-        this.setNtColor(unselected);
-        isSelectedListener();
     }
 
     public PDBRibose getRibose() {
@@ -121,8 +118,8 @@ public class PDBCytidine extends PDBNucleotide
             } break;
 
         }
-        if (isSelectedProperty().getValue()) setNtColor(selected);
-        else setNtColor(unselected);
+        // Bind color to selection state
+        this.ntColorProperty().bind(Bindings.when(isSelectedProperty()).then(selected).otherwise(unselected));
     }
 
 
@@ -174,23 +171,6 @@ public class PDBCytidine extends PDBNucleotide
 
         }
 
-    }
-
-
-
-    // Add listener to react to selection change event
-    private void isSelectedListener()
-    {
-        this.isSelectedProperty().addListener((observable, oldValue, newValue) -> {
-            if (newValue)
-            {
-                this.setNtColor(selected);
-            }
-            else
-            {
-                this.setNtColor(unselected);
-            }
-        });
     }
 
 

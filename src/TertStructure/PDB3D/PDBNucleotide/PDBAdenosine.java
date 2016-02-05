@@ -1,6 +1,7 @@
 package TertStructure.PDB3D.PDBNucleotide;
 
 import GUI.PDB123PrintLog;
+import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
 import javafx.geometry.Point3D;
 import javafx.scene.Group;
@@ -35,10 +36,7 @@ public class PDBAdenosine extends PDBNucleotide
     private PDBRibose ribo;
     private PDBAdenine ade;
     private PDBBackbone pbb;
-    // Set default colors
-    private Color unselected = Color.DARKGREEN;
-    private Color selected = Color.DARKGREEN.invert();
-
+    private Color unselected, selected;
 
     public PDBAdenosine(PDB123PrintLog log) {
         super(log);
@@ -47,8 +45,6 @@ public class PDBAdenosine extends PDBNucleotide
         this.pbb = new PDBBackbone();
         // Keep track of atoms with undefined coordinates
         defAtoms = new ArrayList<>(Collections.nCopies(26, false));
-        this.setNtColor(unselected);
-        isSelectedListener();
     }
 
     public PDBRibose getRibose() {
@@ -128,8 +124,8 @@ public class PDBAdenosine extends PDBNucleotide
                 this.selected = Color.DARKBLUE.invert();
             } break;
         }
-        if (isSelectedProperty().getValue()) setNtColor(selected);
-        else setNtColor(unselected);
+        // Bind color to selection state
+        this.ntColorProperty().bind(Bindings.when(isSelectedProperty()).then(selected).otherwise(unselected));
     }
     // SetAtom converts the PDB raw input into accesible Java Points3D coordinates
     @Override

@@ -3,7 +3,10 @@ package TertStructure.Basepairing;
 import GUI.PDB123PrintLog;
 import SecStructure.RNA2D.Rna2DEdge;
 import TertStructure.PDB3D.PDBNucleotide.*;
+import TertStructure.RNA3DComponents.DrawHydrogen;
 import TertStructure.RNA3DComponents.DrawHydrogenBond;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.geometry.Point3D;
 import javafx.scene.Group;
 
@@ -102,6 +105,8 @@ public class HydrogenBondDetector {
         Group hdbAdeUra = new Group();
         // Remember if HDB had to be detected without hydrogen atom(s)
         Boolean missingHydrogen = false;
+        // Add common boolean property to both h.bonds
+        BooleanProperty adeUraSelected = new SimpleBooleanProperty(false);
         // Check first potential hydrogenbond
         // between ade NH2(6) and ura O4
         // ade NH2(6) has two hydrogens: H61 and H62
@@ -121,7 +126,7 @@ public class HydrogenBondDetector {
         {
             if (adeN6.distance(uraO4) <= MAXBONDDISTANCE+1)
             {
-                hdbAdeUra.getChildren().add(new DrawHydrogenBond(adeN6, uraO4));
+                hdbAdeUra.getChildren().add(new DrawHydrogenBond(adeN6, uraO4, adeNt, uraNt, adeUraSelected));
                 missingHydrogen=true;
             }
             else
@@ -136,7 +141,7 @@ public class HydrogenBondDetector {
                 // Check hydrogen bond angle between ade H61 and ura O4
                 if ((adeH61.distance(uraO4) <= MAXBONDDISTANCE) && (adeH61.angle(adeN6, uraO4) >= MINBONDANGLE)) {
                     // angle is large enough to allow stable HDB
-                    hdbAdeUra.getChildren().add(new DrawHydrogenBond(adeH61, uraO4));
+                    hdbAdeUra.getChildren().add(new DrawHydrogenBond(adeH61, uraO4, adeNt, uraNt, adeUraSelected));
                 } else {
                     // If angle is not large enough for stable HDB,
                     // return null object
@@ -148,7 +153,7 @@ public class HydrogenBondDetector {
                 // Check hydrogen bond angle between ade H62 and ura O4
                 if ((adeH62.distance(uraO4) <= MAXBONDDISTANCE) && (adeH62.angle(adeN6, uraO4) >= MINBONDANGLE)) {
                     // angle is large enough to allow stable HDB
-                    hdbAdeUra.getChildren().add(new DrawHydrogenBond(adeH62, uraO4));
+                    hdbAdeUra.getChildren().add(new DrawHydrogenBond(adeH62, uraO4, adeNt, uraNt, adeUraSelected));
                 } else {
                     // If angle is not large enough for stable HDB,
                     // return null object
@@ -172,7 +177,7 @@ public class HydrogenBondDetector {
         {
             if (adeN1.distance(uraN3) <= MAXBONDDISTANCE+1)
             {
-                hdbAdeUra.getChildren().add(new DrawHydrogenBond(adeN1, uraN3));
+                hdbAdeUra.getChildren().add(new DrawHydrogenBond(adeN1, uraN3, adeNt, uraNt, adeUraSelected));
                 missingHydrogen=true;
             }
             else
@@ -184,7 +189,7 @@ public class HydrogenBondDetector {
         else
         {
             if ((uraH3.distance(adeN1) <= MAXBONDDISTANCE) && uraH3.angle(adeN1, uraN3) >= MINBONDANGLE) {
-                hdbAdeUra.getChildren().add(new DrawHydrogenBond(adeN1, uraH3));
+                hdbAdeUra.getChildren().add(new DrawHydrogenBond(adeN1, uraH3, adeNt, uraNt, adeUraSelected));
             } else {
                 return null;
             }
@@ -197,7 +202,7 @@ public class HydrogenBondDetector {
         adeNt.setBasePaired(true);
         adeNt.setBasePairedTo(uraNt);
         // Add basepair to 2D rna graph
-        Rna2DEdge edge = new Rna2DEdge(uraNt.getRna2DNode(), adeNt.getRna2DNode());
+        Rna2DEdge edge = new Rna2DEdge(uraNt.getRna2DNode(), adeNt.getRna2DNode(), adeUraSelected);
         edge.setEdgeStyle("hydroBond");
         edge2DList.add(edge);
         return hdbAdeUra;
@@ -211,6 +216,8 @@ public class HydrogenBondDetector {
         Group hdbGuaCyt = new Group();
         // Remember if HDB had to be detected without hydrogen atom(s)
         Boolean missingHydrogen = false;
+        // Add common boolean property to all three h.bonds
+        BooleanProperty cytGuaSelected = new SimpleBooleanProperty(false);
         // Check first potential hydrogenbond
         // between gua O6 and cyt NH2(4)
         // cyt NH2(4) has two hydrogens: H41 and H42
@@ -230,7 +237,7 @@ public class HydrogenBondDetector {
         {
             if (guaO6.distance(cytN4) <= MAXBONDDISTANCE+1)
             {
-                hdbGuaCyt.getChildren().add(new DrawHydrogenBond(guaO6, cytN4));
+                hdbGuaCyt.getChildren().add(new DrawHydrogenBond(guaO6, cytN4, guaNt, cytNt, cytGuaSelected));
                 missingHydrogen=true;
             }
             else
@@ -245,7 +252,7 @@ public class HydrogenBondDetector {
                 // Check hydrogen bond angle between cyt H41 and gua O6
                 if ((cytH41.distance(guaO6) <= MAXBONDDISTANCE) && (cytH41.angle(cytN4, guaO6) >= MINBONDANGLE)) {
                     // angle is large enough to allow stable HDB
-                    hdbGuaCyt.getChildren().add(new DrawHydrogenBond(cytH41, guaO6));
+                    hdbGuaCyt.getChildren().add(new DrawHydrogenBond(cytH41, guaO6, guaNt, cytNt, cytGuaSelected));
                 } else {
                     // If angle is not large enough for stable HDB,
                     // return null object
@@ -260,7 +267,7 @@ public class HydrogenBondDetector {
             if ((cytH42.distance(guaO6) <= MAXBONDDISTANCE) && (cytH42.angle(cytN4,guaO6) >= MINBONDANGLE))
             {
                 // angle is large enough to allow stable HDB
-                hdbGuaCyt.getChildren().add(new DrawHydrogenBond(cytH42, guaO6));
+                hdbGuaCyt.getChildren().add(new DrawHydrogenBond(cytH42, guaO6, guaNt, cytNt, cytGuaSelected));
             }
             else
             {
@@ -286,7 +293,7 @@ public class HydrogenBondDetector {
         {
             if (guaN1.distance(cytN3) <= MAXBONDDISTANCE+1)
             {
-                hdbGuaCyt.getChildren().add(new DrawHydrogenBond(guaN1, cytN3));
+                hdbGuaCyt.getChildren().add(new DrawHydrogenBond(guaN1, cytN3, guaNt, cytNt, cytGuaSelected));
                 missingHydrogen=true;
             }
             else
@@ -297,7 +304,7 @@ public class HydrogenBondDetector {
         else
         {
             if ((guaH1.distance(cytN3) <= MAXBONDDISTANCE) && guaH1.angle(guaN1, cytN3) >= MINBONDANGLE) {
-                hdbGuaCyt.getChildren().add(new DrawHydrogenBond(guaH1, cytN3));
+                hdbGuaCyt.getChildren().add(new DrawHydrogenBond(guaH1, cytN3, guaNt, cytNt, cytGuaSelected));
             } else {
                 return null;
             }
@@ -321,7 +328,7 @@ public class HydrogenBondDetector {
         {
             if (guaN2.distance(cytO2) <= MAXBONDDISTANCE+1)
             {
-                hdbGuaCyt.getChildren().add(new DrawHydrogenBond(guaN2, cytO2));
+                hdbGuaCyt.getChildren().add(new DrawHydrogenBond(guaN2, cytO2, guaNt, cytNt, cytGuaSelected));
                 missingHydrogen=true;
             }
             else
@@ -336,7 +343,7 @@ public class HydrogenBondDetector {
                 // Check hydrogen bond angle between gua H21 and cyt O2
                 if ((guaH21.distance(cytO2) <= MAXBONDDISTANCE) && (guaH21.angle(guaN2, cytO2) >= MINBONDANGLE)) {
                     // angle is large enough to allow stable HDB
-                    hdbGuaCyt.getChildren().add(new DrawHydrogenBond(guaH21, cytO2));
+                    hdbGuaCyt.getChildren().add(new DrawHydrogenBond(guaH21, cytO2, guaNt, cytNt, cytGuaSelected));
                 } else {
                     // If angle is not large enough for stable HDB,
                     // return null object
@@ -348,7 +355,7 @@ public class HydrogenBondDetector {
                 // Check hydrogen bond angle between gua H22 and cyt O2
                 if ((guaH22.distance(cytO2) <= MAXBONDDISTANCE) && (guaH22.angle(guaN2, cytO2) >= MINBONDANGLE)) {
                     // angle is large enough to allow stable HDB
-                    hdbGuaCyt.getChildren().add(new DrawHydrogenBond(guaH22, cytO2));
+                    hdbGuaCyt.getChildren().add(new DrawHydrogenBond(guaH22, cytO2, guaNt, cytNt, cytGuaSelected));
                 } else {
                     // If angle is not large enough for stable HDB,
                     // return null object
@@ -363,8 +370,9 @@ public class HydrogenBondDetector {
         guaNt.setBasePairedTo(cytNt);
         cytNt.setBasePaired(true);
         cytNt.setBasePairedTo(guaNt);
+
         // Add basepair to 2D rna graph
-        Rna2DEdge edge = new Rna2DEdge(guaNt.getRna2DNode(), cytNt.getRna2DNode());
+        Rna2DEdge edge = new Rna2DEdge(guaNt.getRna2DNode(), cytNt.getRna2DNode(), cytGuaSelected);
         edge.setEdgeStyle("hydroBond");
         edge2DList.add(edge);
         return  hdbGuaCyt;

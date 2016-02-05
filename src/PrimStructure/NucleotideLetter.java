@@ -3,6 +3,7 @@ package PrimStructure;
 import SelectionModel.PDB123SelectionModel;
 import SelectionModel.Selectable;
 import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.scene.control.Tooltip;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
@@ -19,6 +20,7 @@ public class NucleotideLetter extends Text implements Selectable
     private String letter;
     private BooleanProperty isSelected;
     private String ntId;
+    private BooleanProperty greyScaleOnHL = new SimpleBooleanProperty(false);
 
 
     public NucleotideLetter(String letter, BooleanProperty isSelected, int resIndex) {
@@ -77,5 +79,10 @@ public class NucleotideLetter extends Text implements Selectable
     @Override
     public void setSelected(boolean sel) {
     isSelected.setValue(sel);
+    }
+
+    @Override
+    public void setHLGreyscale(boolean hl) {
+        greyScaleOnHL.setValue(hl);
     }
 }

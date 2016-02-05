@@ -2,6 +2,9 @@ package SecStructure.RNA2D;
 
 import SelectionModel.PDB123SelectionModel;
 import SelectionModel.Selectable;
+import javafx.beans.binding.Bindings;
+import javafx.beans.binding.DoubleExpression;
+import javafx.beans.binding.NumberBinding;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleDoubleProperty;
@@ -21,6 +24,7 @@ public class Rna2DNode extends Circle implements Selectable
     private SimpleDoubleProperty posX = new SimpleDoubleProperty();
     private SimpleDoubleProperty posY = new SimpleDoubleProperty();
     private BooleanProperty isSelected;
+    private BooleanProperty greyScaleOnHL = new SimpleBooleanProperty(false);
 
     // Index of node in structure
     private int nodeNr;
@@ -30,30 +34,14 @@ public class Rna2DNode extends Circle implements Selectable
         this.posX.setValue(posX);
         this.posY.setValue(posY);
         this.setRadius(radius);
-        this.radiusProperty().setValue(radius);
         this.centerXProperty().bind(this.posX);
         this.centerYProperty().bind(this.posY);
         this.nodeNr=nodeNr;
         this.isSelected=isSelected;
-        isSelectedListener();
+        this.radiusProperty().bind(Bindings.when(isSelected).then(radius*1.2).otherwise(radius));
     }
 
 
-    private void isSelectedListener()
-    {
-        isSelected.addListener((observable, oldValue, newValue) -> {
-            if (newValue)
-            {
-
-                this.setRadius(this.getRadius()*1.2);
-            }
-            if (!newValue)
-            {
-
-                this.setRadius(this.getRadius()/1.2);
-            }
-        });
-    }
 
     public SimpleDoubleProperty posXProperty() {
         return posX;
@@ -105,10 +93,12 @@ public class Rna2DNode extends Circle implements Selectable
                 ntId = "Nucleotide";
 
         }
+        // Install tooltip for this 2D node
         Tooltip.install(this, new Tooltip(ntId + " " + nodeNr));
-        // Register Rna2DNode at PDB123SelectionModel
+        // Register Rna2DNode at mouse selection model
         PDB123SelectionModel.registerSelectable(this);
         PDB123SelectionModel.addMouseHandler(this);
+
 
 
     }
@@ -121,5 +111,10 @@ public class Rna2DNode extends Circle implements Selectable
     @Override
     public void setSelected(boolean sel) {
     isSelected.setValue(sel);
+    }
+
+    @Override
+    public void setHLGreyscale(boolean hl) {
+        greyScaleOnHL.setValue(hl);
     }
 }

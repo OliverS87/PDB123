@@ -27,12 +27,8 @@ public class PDB123View extends VBox {
     private TextArea log;
     // Menubar
     private MenuBar menuBar;
-    private Menu menuFile;
-    private Menu menuView;
-    private Menu menuAbout;
-    private MenuItem menuItemOpen;
-    private MenuItem menuItemExit;
-    private MenuItem menuItemClear;
+    private Menu menuFile,menuView,menuAbout, menuEdit;
+    private MenuItem menuItemOpen,menuItemExit,menuItemClear, menuItemInvertSelection, menuItemClearSelection;
     // Subscenes for 1.-3. structure + log/msg window
     private SubScene subScene1D, subScene2D, subScene3D, subSceneLog;
     private StackPane stack3D, stack2D;
@@ -144,9 +140,7 @@ public class PDB123View extends VBox {
         subScene3D.heightProperty().bind(primaryStageHeight.multiply(2. / 3));
         subScene3D.widthProperty().bind(primaryStageWidth.multiply(2. / 3));
         // Set subscene background colors
-       // subScene2D.setFill(Color.TRANSPARENT);
-        //subScene3D.setFill(Color.TRANSPARENT);
-        subSceneLog.setFill(Color.CHOCOLATE);
+        subSceneLog.setFill(Color.TRANSPARENT);
         // Spacing between subscenes
         this.setSpacing(5);
         this.setPadding(new Insets(5));
@@ -165,13 +159,17 @@ public class PDB123View extends VBox {
     private void setMenuBar() {
         menuBar = new MenuBar();
         menuFile = new Menu("File");
+        menuEdit = new Menu("Edit");
         menuView = new Menu("View");
         menuAbout = new Menu("About");
         menuItemOpen = new MenuItem("Open");
         menuItemExit = new MenuItem("Exit");
         menuItemClear = new MenuItem("Clear");
-        menuBar.getMenus().addAll(menuFile, menuView, menuAbout);
+        menuItemInvertSelection = new MenuItem("Invert selection");
+        menuItemClearSelection = new MenuItem("Clear selection");
+        menuBar.getMenus().addAll(menuFile, menuEdit, menuView, menuAbout);
         menuFile.getItems().addAll(menuItemOpen, menuItemExit);
+        menuEdit.getItems().addAll(menuItemInvertSelection, menuItemClearSelection);
         menuView.getItems().addAll(menuItemClear);
         this.getChildren().add(menuBar);
     }
@@ -187,6 +185,14 @@ public class PDB123View extends VBox {
 
     MenuItem getMenuItemClear() {
         return menuItemClear;
+    }
+
+    public MenuItem getMenuItemInvertSelection() {
+        return menuItemInvertSelection;
+    }
+
+    public MenuItem getMenuItemClearSelection() {
+        return menuItemClearSelection;
     }
 
     TextArea getLog() {

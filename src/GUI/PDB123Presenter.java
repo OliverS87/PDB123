@@ -39,6 +39,7 @@ public class PDB123Presenter {
     private Stage stage;
     private ReadPDB pdbReader;
     private PDB123PresenterStructure Rna123DRepresentation;
+    private PDB123PresenterStructureTask Rna123DRepresentationTask;
     private Map<Integer, PDBNucleotide> ntMap;
     private int firstNtIndex, lastNtIndex;
     private Rotate rotateStructureX, rotateStructureY;
@@ -55,6 +56,8 @@ public class PDB123Presenter {
         exitFunction();
         loadFileFunction();
         aboutFunction();
+        // Set functions for menu items of edit menu
+        editFunctions();
         // Add window size listener
         PDB123View.get3DSubScene().widthProperty().addListener(observable -> centerCamera3D());
         PDB123View.get3DSubScene().heightProperty().addListener(observable -> centerCamera3D());
@@ -73,6 +76,12 @@ public class PDB123Presenter {
         // Test function for innovative new moduls
 
 
+    }
+
+    private void editFunctions()
+    {
+
+        PDB123View.getMenuItemClearSelection().setOnAction(event -> PDB123SelectionModel.unselectAll());
     }
 
     private void aboutFunction()

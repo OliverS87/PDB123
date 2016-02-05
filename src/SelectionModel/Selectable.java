@@ -8,4 +8,6 @@ import java.util.ArrayList;
 public interface Selectable {
     public boolean isSelected();
     public void setSelected(boolean sel);
+    public void setHLGreyscale(boolean hl);
+
 }

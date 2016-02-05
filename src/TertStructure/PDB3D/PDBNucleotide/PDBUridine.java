@@ -1,6 +1,7 @@
 package TertStructure.PDB3D.PDBNucleotide;
 
 import GUI.PDB123PrintLog;
+import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
 import javafx.geometry.Point3D;
 import javafx.scene.Group;
@@ -35,8 +36,7 @@ public class PDBUridine extends PDBNucleotide
     private PDBRibose ribo;
     private PDBUracil uri;
     private PDBBackbone pbb;
-    private Color unselected = Color.HOTPINK;
-    private Color selected = Color.HOTPINK.invert();
+    private Color unselected, selected;
 
     public PDBUridine(PDB123PrintLog log) {
         super(log);
@@ -44,8 +44,6 @@ public class PDBUridine extends PDBNucleotide
         this.uri = new PDBUracil();
         this.pbb = new PDBBackbone();
         defAtoms = new ArrayList<>(Collections.nCopies(23, false));
-        this.setNtColor(unselected);
-        isSelectedListener();
     }
 
     public PDBRibose getRibose() {
@@ -110,20 +108,6 @@ public class PDBUridine extends PDBNucleotide
     }
 
 
-    // Add listener to react to selection change event
-    private void isSelectedListener()
-    {
-        this.isSelectedProperty().addListener((observable, oldValue, newValue) -> {
-            if (newValue)
-            {
-                this.setNtColor(selected);
-            }
-            else
-            {
-                this.setNtColor(unselected);
-            }
-        });
-    }
 
 
     // Return 3D structure. Add connecting lines between individual parts.
@@ -184,8 +168,8 @@ public class PDBUridine extends PDBNucleotide
             } break;
 
         }
-        if (isSelectedProperty().getValue()) setNtColor(selected);
-        else setNtColor(unselected);
+        // Bind color to selection state
+        this.ntColorProperty().bind(Bindings.when(isSelectedProperty()).then(selected).otherwise(unselected));
     }
 
     @Override

@@ -23,6 +23,7 @@ import java.util.ArrayList;
  */
 public abstract class PDBNucleotide extends Group implements Selectable{
     private int resIndex;
+    private BooleanProperty greyScaleOnHL = new SimpleBooleanProperty(false);
     private ObjectProperty<Color> ntColor = new SimpleObjectProperty<>();
     private Rna2DNode rna2DNode;
     private BooleanProperty isSelected = new SimpleBooleanProperty(false);
@@ -30,6 +31,12 @@ public abstract class PDBNucleotide extends Group implements Selectable{
     // Count number of defined atoms
     ArrayList<Boolean> defAtoms;
     private PDBNucleotide basePairedTo;
+
+    @Override
+    public void setHLGreyscale(boolean hl) {
+        greyScaleOnHL.setValue(hl);
+    }
+
     // Future: set base pairing status
     protected boolean isBasePaired = false;
     public abstract void setAtom(String[] atom);

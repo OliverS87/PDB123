@@ -1,6 +1,7 @@
 package TertStructure.PDB3D.PDBNucleotide;
 
 import GUI.PDB123PrintLog;
+import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -38,9 +39,7 @@ public class PDBGuanosine extends PDBNucleotide
     private PDBRibose ribo;
     private PDBGuanine gua;
     private PDBBackbone pbb;
-    // Set default colors
-    private Color unselected = Color.CYAN;
-    private Color selected = Color.CYAN.invert();
+    private Color unselected, selected;
 
 
 
@@ -50,8 +49,6 @@ public class PDBGuanosine extends PDBNucleotide
         this.gua = new PDBGuanine();
         this.pbb = new PDBBackbone();
         defAtoms = new ArrayList<>(Collections.nCopies(27, false));
-        this.setNtColor(unselected);
-        isSelectedListener();
     }
 
     public PDBRibose getRibose() {
@@ -119,22 +116,6 @@ public class PDBGuanosine extends PDBNucleotide
 
     }
 
-
-    // Add listener to react to selection change event
-    private void isSelectedListener()
-    {
-        this.isSelectedProperty().addListener((observable, oldValue, newValue) -> {
-            if (newValue)
-            {
-                this.setNtColor(selected);
-            }
-            else
-            {
-                this.setNtColor(unselected);
-            }
-        });
-    }
-
     // Return 3D structure. Add connecting lines between individual parts.
     // Visibility of components can be activated/deactivated by user
     @Override
@@ -191,8 +172,8 @@ public class PDBGuanosine extends PDBNucleotide
             } break;
 
         }
-        if (isSelectedProperty().getValue()) setNtColor(selected);
-        else setNtColor(unselected);
+        // Bind color to selection state
+        this.ntColorProperty().bind(Bindings.when(isSelectedProperty()).then(selected).otherwise(unselected));
     }
 
     @Override

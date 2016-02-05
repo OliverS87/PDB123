@@ -11,6 +11,7 @@ import TertStructure.PDB3D.PDBNucleotide.PDBNucleotide;
 import TertStructure.RNA3DComponents.DrawLine;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.concurrent.Task;
 import javafx.scene.AmbientLight;
 import javafx.scene.Group;
 import javafx.scene.SubScene;
@@ -30,7 +31,7 @@ import java.util.Map;
  * Final 2D structure is then build by RNA2D.RNA2DGraph.
  *
  */
-public class PDB123PresenterStructure
+public class PDB123PresenterStructureTask extends Task<Void>
 {
     private Group structure3D;
     private HydrogenBondDetector hbDetector;
@@ -38,18 +39,40 @@ public class PDB123PresenterStructure
     private ParsePrimaryStructure parseSeq;
     private Rna2DGraph Graph2D;
     private PDB123PrintLog printLog;
+    private int firstNtIndex, lastNtIndex;
+    private String colorMode;
+    private Map<Integer, PDBNucleotide> ntMap;
+    private BooleanProperty showBackbone, showSugar, showNucleoBase;
+    private ArrayList<Rna2DNode> rna2DNodes;
+    private ArrayList<Rna2DEdge> rna2DEdges;
+    private TextFlow primaryStructure;
+    private Group secStructure;
+    private SubScene subScene2D;
 
-    public PDB123PresenterStructure(Group structure3D, PDB123PrintLog printLog) {
+    public PDB123PresenterStructureTask(Group structure3D, PDB123PrintLog printLog, int firstNtIndex, int lastNtIndex, String colorMode, Map<Integer, PDBNucleotide> ntMap, BooleanProperty showBackbone, BooleanProperty showSugar, BooleanProperty showNucleoBase, ArrayList<Rna2DNode> rna2DNodes, ArrayList<Rna2DEdge> rna2DEdges, TextFlow primaryStructure, Group secStructure, SubScene subScene2D) {
 
         this.structure3D = structure3D;
         this.hbDetector = new HydrogenBondDetector(printLog);
         this.dotBracket = new DotBracket(printLog);
         this.parseSeq = new ParsePrimaryStructure();
         this.printLog = printLog;
-
-
+        this.firstNtIndex = firstNtIndex;
+        this.lastNtIndex = lastNtIndex;
+        this.colorMode = colorMode;
+        this.ntMap = ntMap;
+        this.showBackbone = showBackbone;
+        this.showSugar = showSugar;
+        this.showNucleoBase = showNucleoBase;
+        this.rna2DNodes = rna2DNodes;
+        this.rna2DEdges = rna2DEdges;
+        this.primaryStructure = primaryStructure;
+        this.secStructure = secStructure;
+        this.subScene2D = subScene2D;
     }
-    public void generate123DRepresentation(int firstNtIndex, int lastNtIndex, String colorMode, Map<Integer, PDBNucleotide> ntMap, BooleanProperty showBackbone, BooleanProperty showSugar, BooleanProperty showNucleoBase, ArrayList<Rna2DNode> rna2DNodes, ArrayList<Rna2DEdge> rna2DEdges, TextFlow primaryStructure, Group secStructure, SubScene subScene2D){
+
+    @Override
+    protected Void call() throws Exception {
+        System.out.println("0");
         // Clear previous 3D structure
         structure3D.getChildren().clear();
         // Clear previous 2D structure
@@ -82,8 +105,8 @@ public class PDB123PresenterStructure
 
             // Initialize a 2D Node ("Circle") for 2D representation
             // Store a reference to the 2D Node in PDBNucleotide
-            // Use arbitrary x/y coordinates. These will be updated at a later stage
             Rna2DNode curr2DNode = new Rna2DNode(0.,0.,2,i, currentNt.isSelectedProperty());
+            // Use arbitrary x/y coordinates. These will be updated at a later stage
             curr2DNode.identify(currentNt.getType().charAt(0));
             curr2DNode.fillProperty().bind(currentNt.ntColorProperty());
             rna2DNodes.add(curr2DNode);
@@ -105,6 +128,7 @@ public class PDB123PresenterStructure
             prevIndex = i;
             prev = currentNt;
         }
+        System.out.println("1");
         // Identify and visualize hydrogen bonds
         detectHydrogenBonds(firstNtIndex, lastNtIndex, ntMap, rna2DEdges);
         // Derive a dot-bracket notation from the detected hydrogen bonding pattern
@@ -115,10 +139,11 @@ public class PDB123PresenterStructure
         // Set 1D RNA representation
         // 1-letter Text objects are added to the FlowPane
         parseSeq.parseRnaSeq(ntMap, firstNtIndex, lastNtIndex, primaryStructure);
-
-
-
+        System.out.println("2");
+        return null;
     }
+
+
 
 
     private void detectHydrogenBonds(int firstNtIndex, int lastNtIndex, Map<Integer, PDBNucleotide> ntMap, ArrayList<Rna2DEdge> rna2DEdges)
