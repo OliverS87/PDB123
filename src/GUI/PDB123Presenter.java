@@ -1,31 +1,23 @@
 package GUI;
 
+import Charts.PDBBarChart;
 import PDBParser.ReadPDB;
-import PrimStructure.ParsePrimaryStructure;
 import SecStructure.RNA2D.Rna2DEdge;
-import SecStructure.RNA2D.Rna2DGraph;
 import SecStructure.RNA2D.Rna2DNode;
 import SelectionModel.PDB123SelectionModel;
 import TertStructure.PDB3D.PDBNucleotide.PDBNucleotide;;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
-import javafx.geometry.Bounds;
 import javafx.scene.Group;
-import javafx.scene.Node;
 import javafx.scene.PerspectiveCamera;
 import javafx.scene.Scene;
-import javafx.scene.control.Tooltip;
-import javafx.scene.input.PickResult;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
+import javafx.scene.text.TextFlow;
 import javafx.scene.transform.Rotate;
-import javafx.stage.FileChooser;
-import javafx.stage.Stage;
-import javafx.stage.Window;
+import javafx.stage.*;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Map;
 
@@ -37,17 +29,13 @@ import java.util.Map;
 public class PDB123Presenter {
     private GUI.PDB123View PDB123View;
     private Stage stage;
-    private ReadPDB pdbReader;
-    private PDB123PresenterStructure Rna123DRepresentation;
-    private PDB123PresenterStructureTask Rna123DRepresentationTask;
-    private Map<Integer, PDBNucleotide> ntMap;
-    private int firstNtIndex, lastNtIndex;
     private Rotate rotateStructureX, rotateStructureY;
     private double mouseXold, mouseXnew, mouseYold, mouseYNew, mouseXDelta, mouseYDelta;
     private PDB123PrintLog printLog;
-    private BooleanProperty showBackbone, showSugar, showNucleoBase;
-    private ArrayList<Rna2DNode> Node2DList;
-    private ArrayList<Rna2DEdge> Edge2DList;
+    private BooleanProperty showBackbone, showSugar, showNucleoBase, showHBonds;
+    private PDB123SettingsPresenter settingsWindow;
+    private String path;
+    private PDBBarChart barChart;
 
     public PDB123Presenter(Stage primaryStage) {
         // Initialize class variables
@@ -58,6 +46,8 @@ public class PDB123Presenter {
         aboutFunction();
         // Set functions for menu items of edit menu
         editFunctions();
+        // Set functions for menu items of view menu
+        viewFunctions();
         // Add window size listener
         PDB123View.get3DSubScene().widthProperty().addListener(observable -> centerCamera3D());
         PDB123View.get3DSubScene().heightProperty().addListener(observable -> centerCamera3D());
@@ -74,6 +64,8 @@ public class PDB123Presenter {
         // Set center-button actions
         setCenterButtons();
         // Test function for innovative new moduls
+        // Set redraw bindings
+        redrawBindings();
 
 
     }
@@ -82,19 +74,32 @@ public class PDB123Presenter {
     {
 
         PDB123View.getMenuItemClearSelection().setOnAction(event -> PDB123SelectionModel.unselectAll());
+        PDB123View.getMenuItemSettings().setOnAction(event -> {
+            settingsWindow.getSettingsStage().show();
+        });
+    }
+    private void viewFunctions()
+    {
+        PDB123View.getMenuItemStats().setOnAction(event -> {
+
+          //  stackedBarChart.updateData(ntMap, firstNtIndex, lastNtIndex);
+            barChart.getBarChartStage().show();
+        });
     }
 
     private void aboutFunction()
     {
         PDB123View.getMenuItemClear().setOnAction(event -> {
-            test();
+
         });
 
     }
 
-    private void test()
+    private void redrawBindings()
     {
-
+    settingsWindow.redrawProperty().addListener((observable, oldValue, newValue) -> {
+        if (newValue && path != null) loadStructureTask();
+    });
 
 
 
@@ -120,6 +125,7 @@ public class PDB123Presenter {
         showSugar.bind(PDB123View.getcBsugar3D().selectedProperty());
         PDB123View.getcBpBB3D().setSelected(false);
         showBackbone.bind(PDB123View.getcBpBB3D().selectedProperty());
+        showHBonds.bind(PDB123View.getcBhDB().selectedProperty());
     }
 
     private void centerCamera3D()
@@ -146,14 +152,14 @@ public class PDB123Presenter {
         this.stage = primaryStage;
         PDB123View = new PDB123View(primaryStage);
         this.printLog = new PDB123PrintLog(PDB123View.getLog());
-        this.pdbReader = new ReadPDB(this.printLog);
-        this.Rna123DRepresentation = new PDB123PresenterStructure(PDB123View.getThreeDrawings(), printLog);
+
         this.showNucleoBase = new SimpleBooleanProperty(true);
         this.showSugar = new SimpleBooleanProperty(true);
         this.showBackbone = new SimpleBooleanProperty(true);
-        this.Node2DList = new ArrayList<>();
-        this.Edge2DList = new ArrayList<>();
+        this.showHBonds = new SimpleBooleanProperty(true);
+        this.barChart = new PDBBarChart();
         PDB123SelectionModel.initSelectionModel();
+        this.settingsWindow = new PDB123SettingsPresenter();
     }
 
     // Menu -> exit
@@ -168,7 +174,7 @@ public class PDB123Presenter {
             // Try to load a file
             // If file loading canceled -> print message
             // else: print file name
-            String path = null;
+            path = null;
             try {
                 path = showFileChooser();
             } catch (Exception e) {
@@ -177,29 +183,69 @@ public class PDB123Presenter {
             if (path == null) return;
             String fileName = path.substring(Math.max(path.lastIndexOf('/'), path.lastIndexOf('\\')) + 1);
             printLog.printLogMessage("File loaded " + fileName);
-            // Try to parse PDB file
-            try {
-                pdbReader.setFilePath(path);
-                ntMap = pdbReader.getNtMap();
-                firstNtIndex = pdbReader.getFirstNtIndex();
-                lastNtIndex = pdbReader.getLastNtIndex();
-                // (re)center camera
-                centerCamera3D();
-                center2D();
-                // Derive 1D, 2D and 3D RNA representation from ntMap
-                // ntMap contains PDBNucleotides (Java representation of PDB 3D coordinates)
-                // and residue index positions
-                Rna123DRepresentation.generate123DRepresentation(firstNtIndex, lastNtIndex, "resType", ntMap, showBackbone, showSugar, showNucleoBase, Node2DList, Edge2DList, PDB123View.getPrimStructure(), PDB123View.getSecDrawings(), PDB123View.getSubScene2D());
-                //Stage d3Stage = new Stage();
-                //d3Stage.setTitle("3D Representation");
-                //Scene d3Scene = new Scene(PDB123View.getStack3D(), 600,400);
-                //d3Stage.setScene(d3Scene);
-                //d3Stage.show();
+            // (re)center camera
+            centerCamera3D();
+            center2D();
+            // Employ a background task to load 1,2 and 3D structure from PDB file
+            loadStructureTask();
 
 
-            } catch (IOException e) {
-                printLog.printLogMessage("Error while parsing PDB file.");
+
+        });
+    }
+
+    private void loadStructureTask()
+    {
+
+
+        // Derive 1D, 2D and 3D RNA representation from ntMap
+        // ntMap contains PDBNucleotides (Java representation of PDB 3D coordinates)
+        // and residue index positions
+
+
+
+        PDB123PresenterStructureTask task1 = new PDB123PresenterStructureTask(printLog, path, "resType", PDB123View.getSubScene2D(), barChart);
+        Stage progressStage = new Stage(StageStyle.UNDECORATED);
+        progressStage.initModality(Modality.WINDOW_MODAL);
+        progressStage.setAlwaysOnTop(true);
+
+        PDB123ProgressPresenter progressPresenter = new PDB123ProgressPresenter(task1, progressStage);
+        Scene progressScene = new Scene(progressPresenter.getProgressView(), 200,150);
+        progressScene.getStylesheets().add("GUI/myStyle.css");
+        progressScene.setFill(Color.BLUE);
+
+        progressStage.setScene(progressScene);
+        progressStage.show();
+        task1.setBooleanProperties(showBackbone, showSugar, showNucleoBase, showHBonds);
+        task1.setSettings(settingsWindow);
+        task1.exceptionProperty().addListener((observable, oldValue, newValue) -> {
+            if(task1.isCancelled()) System.out.println("Loading canceled.");
+            else System.out.println("Sadly, an error occured.");
+        });
+        Thread structureThread = new Thread(task1);
+        structureThread.setDaemon(true);
+        structureThread.start();
+        task1.valueProperty().addListener((observable, oldValue, newValue) -> {
+            // Add 1D representation
+            // Textflow requires that all Text nodes are added sequentielly to the parent node
+            // Adding Text nodes as group causes them to stack upon each other
+            ArrayList<Text> primStructure = (ArrayList<Text>) newValue.get(0);
+            TextFlow primStructureNode = PDB123View.getPrimStructure();
+            primStructureNode.getChildren().clear();
+            for (Text t: primStructure
+                    ) {
+                primStructureNode.getChildren().add(t);
+
             }
+            // Add 2D representation
+            PDB123View.getSecDrawings().getChildren().clear();
+            PDB123View.getSecDrawings().getChildren().add((Group)newValue.get(1));
+            // Add 3D representation
+            PDB123View.getThreeDrawings().getChildren().clear();
+            PDB123View.getThreeDrawings().getChildren().add((Group)newValue.get(2));
+            // Setup bar chart
+            int[][] ntCounts = (int[][]) newValue.get(3);
+            barChart.updateData(ntCounts[0], ntCounts[1]);
         });
     }
 
@@ -214,7 +260,6 @@ public class PDB123Presenter {
     {
         PerspectiveCamera cam = PDB123View.get3DCamera();
         cam.setNearClip(0.0000001);
-        //cam.setFarClip(-100000.0);
         cam.setFarClip(1000.0);
     }
 

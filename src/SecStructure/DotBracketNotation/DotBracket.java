@@ -34,7 +34,7 @@ public class DotBracket {
     }
 
     // Compute dot-bracket string
-    public String getDotBracket()
+    public String getDotBracket(Boolean detectPseudoKnots)
     {
         //New ArrayList, filled with empty string from pos. 0 to pos. last nt index
         ArrayList<String> dotBracketList = new ArrayList<>(Collections.nCopies(lastNtIndex+1, ""));
@@ -63,13 +63,15 @@ public class DotBracket {
                }
            }
         }
-        ArrayList<Integer[]> pseudoknots = pseudoKnotDetector.detectCross();
-        for (Integer[] pseudoKnot: pseudoknots
-             ) {
-            printLog.printLogMessage("Pseudoknot: "+pseudoKnot[0]+" "+pseudoKnot[1]);
-            dotBracketList.set(pseudoKnot[0],"{");
-            dotBracketList.set(pseudoKnot[1],"}");
+        if (detectPseudoKnots) {
+            ArrayList<Integer[]> pseudoknots = pseudoKnotDetector.detectCross();
+            for (Integer[] pseudoKnot : pseudoknots
+                    ) {
+                printLog.printLogMessage("Pseudoknot: " + pseudoKnot[0] + " " + pseudoKnot[1]);
+                dotBracketList.set(pseudoKnot[0], "{");
+                dotBracketList.set(pseudoKnot[1], "}");
 
+            }
         }
         // Convert ArrayList to simple string and return
         String dotBracket = String.join("", dotBracketList);

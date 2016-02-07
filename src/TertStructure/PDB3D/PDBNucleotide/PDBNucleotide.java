@@ -1,6 +1,7 @@
 package TertStructure.PDB3D.PDBNucleotide;
 
 import GUI.PDB123PrintLog;
+import GUI.PDB123SettingsPresenter;
 import SecStructure.RNA2D.Rna2DNode;
 import SelectionModel.PDB123SelectionModel;
 import SelectionModel.Selectable;
@@ -26,6 +27,7 @@ public abstract class PDBNucleotide extends Group implements Selectable{
     private BooleanProperty greyScaleOnHL = new SimpleBooleanProperty(false);
     private ObjectProperty<Color> ntColor = new SimpleObjectProperty<>();
     private Rna2DNode rna2DNode;
+    private PDB123SettingsPresenter settings;
     private BooleanProperty isSelected = new SimpleBooleanProperty(false);
     PDB123PrintLog printLog;
     // Count number of defined atoms
@@ -41,9 +43,10 @@ public abstract class PDBNucleotide extends Group implements Selectable{
     protected boolean isBasePaired = false;
     public abstract void setAtom(String[] atom);
 
-    public PDBNucleotide(PDB123PrintLog log)
+    public PDBNucleotide(PDB123PrintLog log, PDB123SettingsPresenter settings)
     {
         this.printLog = log;
+        this.settings=settings;
         PDB123SelectionModel.registerSelectable(this);
         PDB123SelectionModel.addMouseHandler(this);
     }
@@ -59,7 +62,6 @@ public abstract class PDBNucleotide extends Group implements Selectable{
     public abstract void getStructure(BooleanProperty showBackbone, BooleanProperty showSugar, BooleanProperty showNucleoBase);
     public abstract Point3D getFivePrimeEnd();
     public abstract Point3D getThreePrimeEnd();
-    public abstract void setColorMode(String colorMode);
     public abstract Point3D getCentralCoordinate();
     public boolean isBasePaired(){
         return isBasePaired;
@@ -101,4 +103,10 @@ public abstract class PDBNucleotide extends Group implements Selectable{
     public void setSelected(boolean sel) {
     isSelected.setValue(sel);
     }
+
+    public PDB123SettingsPresenter getSettings() {
+        return settings;
+    }
+
+
 }

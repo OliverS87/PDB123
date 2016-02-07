@@ -1,8 +1,12 @@
 package TertStructure.PDB3D.PDBNucleotide;
 
 import GUI.PDB123PrintLog;
+import GUI.PDB123SettingsPresenter;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.geometry.Point3D;
 import javafx.scene.Group;
 import TertStructure.PDB3D.PDBBackbone.PDBBackbone;
@@ -36,15 +40,20 @@ public class PDBAdenosine extends PDBNucleotide
     private PDBRibose ribo;
     private PDBAdenine ade;
     private PDBBackbone pbb;
-    private Color unselected, selected;
+    private ObjectProperty<Color> unselected, selected;
 
-    public PDBAdenosine(PDB123PrintLog log) {
-        super(log);
+    public PDBAdenosine(PDB123PrintLog log,PDB123SettingsPresenter settings) {
+        super(log, settings);
         this.ribo = new PDBRibose();
         this.ade = new PDBAdenine();
         this.pbb = new PDBBackbone();
         // Keep track of atoms with undefined coordinates
         defAtoms = new ArrayList<>(Collections.nCopies(26, false));
+        // Add listener
+        addListener();
+        // Set initial color mode
+        setColorMode(settings.colorModeProperty().getValue());
+
     }
 
     public PDBRibose getRibose() {
@@ -107,25 +116,33 @@ public class PDBAdenosine extends PDBNucleotide
         Tooltip.install(this, new Tooltip("Ade_"+this.getResIndex()));
         this.getChildren().add(adenosineGrp);
     }
+
+
+    private void addListener()
+    {
+        StringProperty colorModeProperty = this.getSettings().colorModeProperty();
+        colorModeProperty.addListener((observable, oldValue, newValue) -> setColorMode(newValue));
+
+    }
     // Color purin ring according to colormode
     // Colormode could be:
     // - Type of residue
     // - Purin or Pyrimidine
-    public void setColorMode(String colorMode)
+    private void setColorMode(String colorMode)
     {
-        switch (colorMode){
-            case("resType"):{
-                this.unselected = Color.web("#6a9738");
-                this.selected = Color.web("#6afc38");
+            switch (colorMode){
+                case("resType"):{
+                    this.unselected = this.getSettings().adeUnselectedColorProperty();
+                    this.selected = this.getSettings().adeSelectedColorProperty();
 
-            } break;
-            case("baseType"):{
-                this.unselected = Color.DARKBLUE;
-                this.selected = Color.DARKBLUE.invert();
-            } break;
-        }
-        // Bind color to selection state
-        this.ntColorProperty().bind(Bindings.when(isSelectedProperty()).then(selected).otherwise(unselected));
+                } break;
+                case("baseType"):{
+                    this.unselected = this.getSettings().purUnselectedColorProperty();
+                    this.selected = this.getSettings().purSelectedColorProperty();
+                } break;
+            }
+            // Bind color to selection state
+            this.ntColorProperty().bind(Bindings.when(isSelectedProperty()).then(selected).otherwise(unselected));
     }
     // SetAtom converts the PDB raw input into accesible Java Points3D coordinates
     @Override
@@ -168,20 +185,7 @@ public class PDBAdenosine extends PDBNucleotide
 
     }
 
-    // Add listener to react to selection change event
-    private void isSelectedListener()
-    {
-        this.isSelectedProperty().addListener((observable, oldValue, newValue) -> {
-            if (newValue)
-            {
-                this.setNtColor(selected);
-            }
-            else
-            {
-                this.setNtColor(unselected);
-            }
-        });
-    }
+
 
     @Override
     public String getType() {

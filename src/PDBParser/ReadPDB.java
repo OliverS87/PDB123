@@ -1,6 +1,7 @@
 package PDBParser;
 
 import GUI.PDB123PrintLog;
+import GUI.PDB123SettingsPresenter;
 import TertStructure.PDB3D.PDBNucleotide.*;
 
 import java.io.BufferedReader;
@@ -27,6 +28,7 @@ public class ReadPDB
     // Store the offset of the molecule from the origin
     private double xOffset, yOffset, zOffset;
     private PDB123PrintLog log;
+    private PDB123SettingsPresenter settings;
     public ReadPDB(PDB123PrintLog log)  {
         this.log=log; this.ntList = new ArrayList<>();
     }
@@ -38,6 +40,10 @@ public class ReadPDB
         // Remove previous Nucleotides
         ntList.clear();
         readPDB();
+    }
+    public void setSettings(PDB123SettingsPresenter settings)
+    {
+        this.settings = settings;
     }
 
 
@@ -125,10 +131,10 @@ public class ReadPDB
                 // Generate a new PDBNucleotide depending on the current residue type
                 switch (resType)
                 {
-                    case('A'): currNt = new PDBAdenosine(log);break;
-                    case('C'): currNt = new PDBCytidine(log);break;
-                    case('G'): currNt = new PDBGuanosine(log);break;
-                    case('U'): currNt = new PDBUridine(log);break;
+                    case('A'): currNt = new PDBAdenosine(log, settings);break;
+                    case('C'): currNt = new PDBCytidine(log, settings);break;
+                    case('G'): currNt = new PDBGuanosine(log, settings);break;
+                    case('U'): currNt = new PDBUridine(log, settings);break;
                 }
                 // Set new seq. index position as new reference
                 currPosIndex=nextPosIndex;

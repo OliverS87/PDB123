@@ -1,8 +1,11 @@
 package TertStructure.PDB3D.PDBNucleotide;
 
 import GUI.PDB123PrintLog;
+import GUI.PDB123SettingsPresenter;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.StringProperty;
 import javafx.geometry.Point3D;
 import javafx.scene.Group;
 import TertStructure.PDB3D.PDBBackbone.PDBBackbone;
@@ -36,15 +39,19 @@ public class PDBCytidine extends PDBNucleotide
     private PDBRibose ribo;
     private PDBCytosine cyt;
     private PDBBackbone pbb;
-    private Color unselected, selected;
+    private ObjectProperty<Color> unselected, selected;
 
-    public PDBCytidine(PDB123PrintLog log) {
-        super(log);
+    public PDBCytidine(PDB123PrintLog log,PDB123SettingsPresenter settings) {
+        super(log, settings);
         this.ribo = new PDBRibose();
         this.cyt = new PDBCytosine();
         this.pbb = new PDBBackbone();
         // Keep track of atoms with undefined coordinates
         defAtoms = new ArrayList<>(Collections.nCopies(24, false));
+        // Add listener
+        addListener();
+        // Set initial color mode
+        setColorMode(settings.colorModeProperty().getValue());
     }
 
     public PDBRibose getRibose() {
@@ -104,22 +111,29 @@ public class PDBCytidine extends PDBNucleotide
     // Colormode could be:
     // - Type of residue
     // - Purin or Pyrimidine
-    public void setColorMode(String colorMode)
+    private void setColorMode(String colorMode)
     {
         switch (colorMode){
             case("resType"):{
-                this.unselected = Color.web("#cab938");
-                this.selected = Color.web("#caff38");
+                this.unselected = this.getSettings().cytUnselectedColorProperty();
+                this.selected = this.getSettings().cytSelectedColorProperty();
 
             } break;
             case("baseType"):{
-                this.unselected = Color.DARKRED;
-                this.selected = Color.DARKRED.invert();
+                this.unselected = this.getSettings().pyrUnselectedColorProperty();
+                this.selected = this.getSettings().pyrSelectedColorProperty();
             } break;
 
         }
         // Bind color to selection state
         this.ntColorProperty().bind(Bindings.when(isSelectedProperty()).then(selected).otherwise(unselected));
+    }
+
+    private void addListener()
+    {
+        StringProperty colorModeProperty = this.getSettings().colorModeProperty();
+        colorModeProperty.addListener((observable, oldValue, newValue) -> setColorMode(newValue));
+
     }
 
 

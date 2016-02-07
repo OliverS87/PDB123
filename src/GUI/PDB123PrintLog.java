@@ -1,5 +1,6 @@
 package GUI;
 
+import javafx.application.Platform;
 import javafx.scene.control.TextArea;
 
 /**
@@ -14,8 +15,16 @@ public class PDB123PrintLog {
     public PDB123PrintLog(TextArea log) {
         this.log = log;
     }
+    // Print a String message to the log textarea
+    // Function contains a Platform.runlater call
+    // Necessary when accessing this function from outside
+    // the JavaFX application thread. Otherwise the UI
+    // might get out of sync
     public void printLogMessage (String msg)
     {
-        log.appendText(msg + "\n");
+
+        Platform.runLater(() -> {
+            log.appendText(msg + "\n");
+        });
     }
 }

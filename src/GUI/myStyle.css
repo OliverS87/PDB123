@@ -9,7 +9,7 @@
 -fx-font-size: 20px;
 }
 .check-box{
--fx-text-fill: white;
+-fx-text-fill: darkblue;
 }
 .button:hover{
 -fx-background-color: green;
@@ -39,10 +39,10 @@
 }
 .slider{
 -fx-background-color: transparent;
--fx-text-fill: white;
+-fx-text-fill: darkblue;
 }
 .slider .axis {
-    -fx-tick-label-fill: white;
+    -fx-tick-label-fill: darkblue;
 }
 
 .label{
@@ -58,4 +58,13 @@
 -fx-border-style: solid;
 -fx-border-color: black;
 -fx-background-color: transparent;
+}
+.color-picker{
+-fx-color-label-visible:false;
+}
+.chart{
+-fx-legend-side:right;
+}
+.chart-content{
+-fx-background-color:lightblue;
 }

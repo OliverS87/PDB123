@@ -28,7 +28,7 @@ public class PDB123View extends VBox {
     // Menubar
     private MenuBar menuBar;
     private Menu menuFile,menuView,menuAbout, menuEdit;
-    private MenuItem menuItemOpen,menuItemExit,menuItemClear, menuItemInvertSelection, menuItemClearSelection;
+    private MenuItem menuItemOpen,menuItemExit,menuItemClear, menuItemInvertSelection, menuItemClearSelection, menuItemSettings, menuItemStats;
     // Subscenes for 1.-3. structure + log/msg window
     private SubScene subScene1D, subScene2D, subScene3D, subSceneLog;
     private StackPane stack3D, stack2D;
@@ -47,7 +47,8 @@ public class PDB123View extends VBox {
     // Buttons for re-centering
     private Button center3D, center2D;
     // Checkboxes to add/remove drawings of 3D or 2D components
-    CheckBox cBsugar3D, cBnucleoBase3D, cBpBB3D, cBhDB, cBnodes2D, cBedges2D;
+    private CheckBox cBsugar3D, cBnucleoBase3D, cBpBB3D, cBhDB, cBnodes2D, cBedges2D;
+
 
 
 
@@ -92,6 +93,7 @@ public class PDB123View extends VBox {
         // Hboxes for 3D and 2D controls
         controls2D = new HBox();
         controls3D = new HBox();
+
 
     }
 
@@ -165,12 +167,14 @@ public class PDB123View extends VBox {
         menuItemOpen = new MenuItem("Open");
         menuItemExit = new MenuItem("Exit");
         menuItemClear = new MenuItem("Clear");
+        menuItemStats = new MenuItem("Statisitcs");
         menuItemInvertSelection = new MenuItem("Invert selection");
         menuItemClearSelection = new MenuItem("Clear selection");
+        menuItemSettings = new MenuItem("Settings");
         menuBar.getMenus().addAll(menuFile, menuEdit, menuView, menuAbout);
         menuFile.getItems().addAll(menuItemOpen, menuItemExit);
-        menuEdit.getItems().addAll(menuItemInvertSelection, menuItemClearSelection);
-        menuView.getItems().addAll(menuItemClear);
+        menuEdit.getItems().addAll(menuItemClearSelection, menuItemSettings);
+        menuView.getItems().addAll(menuItemStats);
         this.getChildren().add(menuBar);
     }
 
@@ -235,7 +239,11 @@ public class PDB123View extends VBox {
         return cBpBB3D;
     }
 
-     CheckBox getcBnodes2D() {
+    public CheckBox getcBhDB() {
+        return cBhDB;
+    }
+
+    CheckBox getcBnodes2D() {
         return cBnodes2D;
     }
 
@@ -261,5 +269,17 @@ public class PDB123View extends VBox {
 
     public HBox getSubScenelog3D() {
         return subScenelog3D;
+    }
+
+    public void setPrimStructure(TextFlow primStructure) {
+        this.primStructure = primStructure;
+    }
+
+    public MenuItem getMenuItemSettings() {
+        return menuItemSettings;
+    }
+
+    public MenuItem getMenuItemStats() {
+        return menuItemStats;
     }
 }

@@ -1,12 +1,15 @@
 package TertStructure.Basepairing;
 
 import GUI.PDB123PrintLog;
+import GUI.PDB123SettingsPresenter;
 import SecStructure.RNA2D.Rna2DEdge;
 import TertStructure.PDB3D.PDBNucleotide.*;
 import TertStructure.RNA3DComponents.DrawHydrogen;
 import TertStructure.RNA3DComponents.DrawHydrogenBond;
 import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleDoubleProperty;
 import javafx.geometry.Point3D;
 import javafx.scene.Group;
 
@@ -20,10 +23,10 @@ public class HydrogenBondDetector {
     private Map<Integer, PDBNucleotide> ntMap;
     private int firstNtIndex, lastNtIndex;
     private PDB123PrintLog printLog;
-    private static double MINBONDANGLE = 110.0;
-    private static double MAXBONDDISTANCE = 3.0;
+    private Double MINBONDANGLE,MAXBONDDISTANCE;
     private ArrayList<Rna2DEdge> edge2DList;
     private Group structure3D;
+    private PDB123SettingsPresenter settings;
 
     public HydrogenBondDetector(PDB123PrintLog printLog) {
         this.printLog = printLog;
@@ -44,9 +47,17 @@ public class HydrogenBondDetector {
     public void setRna2DEdge(ArrayList<Rna2DEdge> edge2DList) {this.edge2DList=edge2DList;}
 
     public void setStructure3D(Group structure3D) {this.structure3D = structure3D;}
+    public void setSettings(PDB123SettingsPresenter settings) {this.settings = settings;}
 
-    public void detectHDB()
+    public void detectHDB(BooleanProperty showHBonds)
     {
+        // Add sensitivity factor to hydrogen bond detection limit value
+        MINBONDANGLE = settings.detectionSensitivityProperty().doubleValue()*125;
+        MAXBONDDISTANCE = 3./settings.detectionSensitivityProperty().doubleValue();
+
+
+        System.out.println("MINBONDANGLE:"+MINBONDANGLE);
+        System.out.println("MAXBONDDISTANCE:"+MAXBONDDISTANCE);
         // Container for hydrogen bond visualizations
         Group hydrogenBonds = new Group();
         ArrayList<Integer> ntIndices = new ArrayList<>();
@@ -69,6 +80,7 @@ public class HydrogenBondDetector {
                 }
             }
 
+        hydrogenBonds.visibleProperty().bind(showHBonds);
         structure3D.getChildren().add(hydrogenBonds);
     }
     private Group makeHDB(PDBNucleotide nt1, PDBNucleotide nt2)
@@ -124,7 +136,7 @@ public class HydrogenBondDetector {
         // Add 1 Angstrom to max. allowed distance
         else if (adeH61==null || adeH62 ==null)
         {
-            if (adeN6.distance(uraO4) <= MAXBONDDISTANCE+1)
+            if (adeN6.distance(uraO4) <= MAXBONDDISTANCE)
             {
                 hdbAdeUra.getChildren().add(new DrawHydrogenBond(adeN6, uraO4, adeNt, uraNt, adeUraSelected));
                 missingHydrogen=true;
@@ -175,7 +187,7 @@ public class HydrogenBondDetector {
         // Add 1 Angstrom to max. allowed distance
         else if(uraH3 ==null)
         {
-            if (adeN1.distance(uraN3) <= MAXBONDDISTANCE+1)
+            if (adeN1.distance(uraN3) <= MAXBONDDISTANCE)
             {
                 hdbAdeUra.getChildren().add(new DrawHydrogenBond(adeN1, uraN3, adeNt, uraNt, adeUraSelected));
                 missingHydrogen=true;
@@ -235,7 +247,7 @@ public class HydrogenBondDetector {
         // Add 1 Angstrom to max. allowed distance
         else if (cytH41 ==null|| cytH42 ==null)
         {
-            if (guaO6.distance(cytN4) <= MAXBONDDISTANCE+1)
+            if (guaO6.distance(cytN4) <= MAXBONDDISTANCE)
             {
                 hdbGuaCyt.getChildren().add(new DrawHydrogenBond(guaO6, cytN4, guaNt, cytNt, cytGuaSelected));
                 missingHydrogen=true;
@@ -291,7 +303,7 @@ public class HydrogenBondDetector {
         // Add 1 Angstrom to max. allowed distance
         else if (guaH1 ==null)
         {
-            if (guaN1.distance(cytN3) <= MAXBONDDISTANCE+1)
+            if (guaN1.distance(cytN3) <= MAXBONDDISTANCE)
             {
                 hdbGuaCyt.getChildren().add(new DrawHydrogenBond(guaN1, cytN3, guaNt, cytNt, cytGuaSelected));
                 missingHydrogen=true;
@@ -326,7 +338,7 @@ public class HydrogenBondDetector {
         // Add 1 Angstrom to max. allowed distance
         if (guaH21 ==null || guaH22 ==null)
         {
-            if (guaN2.distance(cytO2) <= MAXBONDDISTANCE+1)
+            if (guaN2.distance(cytO2) <= MAXBONDDISTANCE)
             {
                 hdbGuaCyt.getChildren().add(new DrawHydrogenBond(guaN2, cytO2, guaNt, cytNt, cytGuaSelected));
                 missingHydrogen=true;

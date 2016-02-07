@@ -1,8 +1,11 @@
 package TertStructure.PDB3D.PDBNucleotide;
 
 import GUI.PDB123PrintLog;
+import GUI.PDB123SettingsPresenter;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.StringProperty;
 import javafx.geometry.Point3D;
 import javafx.scene.Group;
 import TertStructure.PDB3D.PDBBackbone.PDBBackbone;
@@ -36,14 +39,20 @@ public class PDBUridine extends PDBNucleotide
     private PDBRibose ribo;
     private PDBUracil uri;
     private PDBBackbone pbb;
-    private Color unselected, selected;
+    private ObjectProperty<Color> unselected, selected;
 
-    public PDBUridine(PDB123PrintLog log) {
-        super(log);
+
+    public PDBUridine(PDB123PrintLog log, PDB123SettingsPresenter settings) {
+        super(log, settings);
         this.ribo = new PDBRibose();
         this.uri = new PDBUracil();
         this.pbb = new PDBBackbone();
+
         defAtoms = new ArrayList<>(Collections.nCopies(23, false));
+        // Add listener
+        addListener();
+        // Set initial color mode
+        setColorMode(settings.colorModeProperty().getValue());
     }
 
     public PDBRibose getRibose() {
@@ -158,20 +167,27 @@ public class PDBUridine extends PDBNucleotide
     {
         switch (colorMode){
             case("resType"):{
-                this.unselected = Color.web("#c34a41");
-                this.selected = Color.web("#ff0064");
+                this.unselected = this.getSettings().uraUnselectedColorProperty();
+                this.selected = this.getSettings().uraSelectedColorProperty();
 
             } break;
             case("baseType"):{
-                this.unselected = Color.DARKRED;
-                this.selected = Color.DARKRED.invert();
+                this.unselected = this.getSettings().pyrUnselectedColorProperty();
+                this.selected = this.getSettings().pyrSelectedColorProperty();
             } break;
 
         }
         // Bind color to selection state
+
         this.ntColorProperty().bind(Bindings.when(isSelectedProperty()).then(selected).otherwise(unselected));
     }
 
+    private void addListener()
+    {
+        StringProperty colorModeProperty = this.getSettings().colorModeProperty();
+        colorModeProperty.addListener((observable, oldValue, newValue) -> setColorMode(newValue));
+
+    }
     @Override
     public String getType() {
         return "U";

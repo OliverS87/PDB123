@@ -1,10 +1,12 @@
 package TertStructure.PDB3D.PDBNucleotide;
 
 import GUI.PDB123PrintLog;
+import GUI.PDB123SettingsPresenter;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.StringProperty;
 import javafx.geometry.Point3D;
 import javafx.scene.Group;
 import TertStructure.PDB3D.PDBBackbone.PDBBackbone;
@@ -39,16 +41,20 @@ public class PDBGuanosine extends PDBNucleotide
     private PDBRibose ribo;
     private PDBGuanine gua;
     private PDBBackbone pbb;
-    private Color unselected, selected;
+    private ObjectProperty<Color> unselected, selected;
 
 
 
-    public PDBGuanosine(PDB123PrintLog log) {
-        super(log);
+    public PDBGuanosine(PDB123PrintLog log, PDB123SettingsPresenter settings) {
+        super(log, settings);
         this.ribo = new PDBRibose();
         this.gua = new PDBGuanine();
         this.pbb = new PDBBackbone();
         defAtoms = new ArrayList<>(Collections.nCopies(27, false));
+        // Add listener
+        addListener();
+        // Set initial color mode
+        setColorMode(settings.colorModeProperty().getValue());
     }
 
     public PDBRibose getRibose() {
@@ -162,13 +168,13 @@ public class PDBGuanosine extends PDBNucleotide
     {
         switch (colorMode){
             case("resType"):{
-                this.unselected = Color.web("#589aff");
-                this.selected = Color.CYAN;
+                this.unselected = this.getSettings().guaUnselectedColorProperty();
+                this.selected = this.getSettings().guaSelectedColorProperty();
 
             } break;
             case("baseType"):{
-                this.unselected = Color.DARKBLUE;
-                this.selected = Color.DARKBLUE.invert();
+                this.unselected = this.getSettings().purUnselectedColorProperty();
+                this.selected = this.getSettings().purSelectedColorProperty();
             } break;
 
         }
@@ -176,6 +182,12 @@ public class PDBGuanosine extends PDBNucleotide
         this.ntColorProperty().bind(Bindings.when(isSelectedProperty()).then(selected).otherwise(unselected));
     }
 
+    private void addListener()
+    {
+        StringProperty colorModeProperty = this.getSettings().colorModeProperty();
+        colorModeProperty.addListener((observable, oldValue, newValue) -> setColorMode(newValue));
+
+    }
     @Override
     public String getType() {
         return "G";

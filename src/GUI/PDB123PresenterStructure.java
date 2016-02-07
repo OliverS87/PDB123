@@ -51,14 +51,14 @@ public class PDB123PresenterStructure
     }
     public void generate123DRepresentation(int firstNtIndex, int lastNtIndex, String colorMode, Map<Integer, PDBNucleotide> ntMap, BooleanProperty showBackbone, BooleanProperty showSugar, BooleanProperty showNucleoBase, ArrayList<Rna2DNode> rna2DNodes, ArrayList<Rna2DEdge> rna2DEdges, TextFlow primaryStructure, Group secStructure, SubScene subScene2D){
         // Clear previous 3D structure
-        structure3D.getChildren().clear();
+        structure3D.getChildren().clear(); // ok
         // Clear previous 2D structure
         rna2DNodes.clear();
         rna2DEdges.clear();
         // Clear previous 1D structure
         primaryStructure.getChildren().clear();
         // Reset selection model
-        PDB123SelectionModel.initSelectionModel();
+        PDB123SelectionModel.initSelectionModel(); // ok
         // Go through the hashmap containing all PDB nucleotides, starting at the lowest index position
         // Store links to previous PDBNucleotide and its index position
         PDBNucleotide prev = null;
@@ -74,11 +74,11 @@ public class PDB123PresenterStructure
             // Get PDBNucleotide at current index position
             PDBNucleotide currentNt = ntMap.get(i);
             // Retrieve 3D structure from current PDBNucleotide
-            currentNt.getStructure(showBackbone, showSugar, showNucleoBase);
+            //currentNt.getStructure(showBackbone, showSugar, showNucleoBase, show);
             // Add 3D structure to 3D subscene
             structure3D.getChildren().add(currentNt);
             // Set the colormode for the 3D structure
-            currentNt.setColorMode(colorMode);
+           // currentNt.setColorMode(colorMode);
 
             // Initialize a 2D Node ("Circle") for 2D representation
             // Store a reference to the 2D Node in PDBNucleotide
@@ -114,7 +114,7 @@ public class PDB123PresenterStructure
 
         // Set 1D RNA representation
         // 1-letter Text objects are added to the FlowPane
-        parseSeq.parseRnaSeq(ntMap, firstNtIndex, lastNtIndex, primaryStructure);
+     //   parseSeq.parseRnaSeq(ntMap, firstNtIndex, lastNtIndex, primaryStructure);
 
 
 
@@ -133,7 +133,7 @@ public class PDB123PresenterStructure
         hbDetector.setNtMap(ntMap);
         hbDetector.setRna2DEdge(rna2DEdges);
         hbDetector.setStructure3D(this.structure3D);
-        hbDetector.detectHDB();
+        //hbDetector.detectHDB(s);
 
     }
 
@@ -145,6 +145,6 @@ public class PDB123PresenterStructure
         dotBracket.setFirstNtIndex(firstNtIndex);
         dotBracket.setLastNtIndex(lastNtIndex);
         // Calculate dotBracket notation and return as String
-        return dotBracket.getDotBracket();
+        return dotBracket.getDotBracket(false);
     }
 }

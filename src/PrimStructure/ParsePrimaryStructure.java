@@ -1,8 +1,11 @@
 package PrimStructure;
 
 import TertStructure.PDB3D.PDBNucleotide.PDBNucleotide;
+import javafx.scene.Group;
+import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 
+import java.util.ArrayList;
 import java.util.Map;
 
 /**
@@ -13,9 +16,9 @@ import java.util.Map;
  */
 public class ParsePrimaryStructure
 {
-    public void parseRnaSeq(Map<Integer, PDBNucleotide> ntMap, int firstNtIndex, int lastNtIndex, TextFlow textFlow)
+    public ArrayList<Text> parseRnaSeq(Map<Integer, PDBNucleotide> ntMap, int firstNtIndex, int lastNtIndex)
     {
-      //  StringBuffer sb = new StringBuffer(lastNtIndex);
+      ArrayList<Text> text1D = new ArrayList<>();
         for (int i = firstNtIndex; i <= lastNtIndex; i++)
         {
             if (ntMap.containsKey(i))
@@ -24,9 +27,9 @@ public class ParsePrimaryStructure
               //  sb.append(currNt.getType());
                 NucleotideLetter currLetter = new NucleotideLetter(currNt.getType(), currNt.isSelectedProperty(), i);
                 currLetter.fillProperty().bind(currNt.ntColorProperty());
-                textFlow.getChildren().add(currLetter);
+                text1D.add(currLetter);
             }
         }
-
+    return text1D;
     }
 }
