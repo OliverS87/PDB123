@@ -7,6 +7,7 @@ import javafx.scene.shape.Sphere;
 
 /**
  * Created by oliver on 25.01.16.
+ * * Simple representation of a nitrogen atom
  */
 public class DrawNitrogen extends Sphere {
     private static  double ATOMRADIUS = 0.56;

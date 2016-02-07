@@ -1,7 +1,5 @@
 package SecStructure.DotBracketNotation;
 
-import GUI.PDB123PrintLog;
-
 import java.util.ArrayList;
 
 /**
@@ -107,6 +105,7 @@ public class PseudoKnots
         }
     }
 
+    // Main function for testing only
     public static void main (String args[])
     {
         System.out.println("Welcome to pseudoknot removal");
@@ -131,11 +130,11 @@ public class PseudoKnots
             this.end = end;
             this.conflictScore = conflictScore;
         }
-        public void increaseConflictScore()
+        private void increaseConflictScore()
         {
             this.conflictScore+=1;
         }
-        public void resetConflictScore()
+        private void resetConflictScore()
         {
             this.conflictScore=0;
         }

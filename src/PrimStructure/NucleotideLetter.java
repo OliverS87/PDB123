@@ -3,9 +3,7 @@ package PrimStructure;
 import SelectionModel.PDB123SelectionModel;
 import SelectionModel.Selectable;
 import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.SimpleBooleanProperty;
 import javafx.scene.control.Tooltip;
-import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
@@ -19,34 +17,28 @@ public class NucleotideLetter extends Text implements Selectable
 {
     private String letter;
     private BooleanProperty isSelected;
-    private String ntId;
-    private BooleanProperty greyScaleOnHL = new SimpleBooleanProperty(false);
-
 
     public NucleotideLetter(String letter, BooleanProperty isSelected, int resIndex) {
         this.letter = letter;
         this.isSelected = isSelected;
         this.setText(letter);
+        // Underline text when nucleotide is selected
         this.underlineProperty().bind(isSelected);
-        letterColor();
-
-        //mouseClickListener();
+        setFont(Font.font ("Verdana", FontWeight.BOLD, 24));
+        Tooltip.install(this, new Tooltip(getNtFullName() + " " + resIndex));
+        // Register instance at PDB123SelectionModel
+        // and add MouseHandler
         PDB123SelectionModel.registerSelectable(this);
         PDB123SelectionModel.addMouseHandler(this);
-        setFont(Font.font ("Verdana", FontWeight.BOLD, 24));
-        Tooltip.install(this, new Tooltip(ntId + " " + resIndex));
+
     }
-    //private void mouseClickListener()
-    //{
-      //  this.setOnMouseClicked(event -> {
-        //    isSelected.setValue(!isSelected.getValue());
-        //});
-    //}
 
 
-    private void letterColor()
+
+    private String getNtFullName()
     {
 
+        String ntId="";
         switch (letter) {
             case ("A"):
                 ntId = "Adenine";
@@ -69,6 +61,7 @@ public class NucleotideLetter extends Text implements Selectable
 
                 break;
          }
+        return ntId;
     }
 
     @Override
@@ -81,8 +74,4 @@ public class NucleotideLetter extends Text implements Selectable
     isSelected.setValue(sel);
     }
 
-    @Override
-    public void setHLGreyscale(boolean hl) {
-        greyScaleOnHL.setValue(hl);
-    }
 }

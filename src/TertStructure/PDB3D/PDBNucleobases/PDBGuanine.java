@@ -10,7 +10,7 @@ import javafx.scene.Group;
  * Returns 3D structure.
  */
 public class PDBGuanine extends PDBPurin {
-     private Point3D  O6, H1, H21, H22, N2;
+    private Point3D O6, H1, H21, H22, N2;
 
     public Point3D getO6() {
         return O6;
@@ -53,7 +53,7 @@ public class PDBGuanine extends PDBPurin {
     }
 
 
-    public Group getStructure(){
+    public Group getStructure() {
         Group guanineGrp = new Group();
         // Draw Purin ring
         DrawPurin drawGuanine = new DrawPurin(this.getN1(), this.getC2(), this.getN1(), this.getC4(), this.getN9(), this.getC8(), this.getN7(), this.getC5(), this.getC6());
@@ -72,8 +72,8 @@ public class PDBGuanine extends PDBPurin {
         DrawLine n2c2 = new DrawLine(N2, this.getC2());
         DrawLine h8c8 = new DrawLine(this.getH8(), this.getC8());
         DrawLine c6ToO6 = new DrawLine(this.getC6(), O6);
-        guanineGrp.getChildren().addAll(meshV, h1, h21, h22, h8, n2,o6,
-        h1n1, h21n2, h22n2, n2c2, h8c8, c6ToO6);
+        guanineGrp.getChildren().addAll(meshV, h1, h21, h22, h8, n2, o6,
+                h1n1, h21n2, h22n2, n2c2, h8c8, c6ToO6);
         return guanineGrp;
     }
 }

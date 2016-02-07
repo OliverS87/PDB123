@@ -16,27 +16,27 @@ import javafx.scene.transform.Translate;
 public class DrawLine extends Cylinder
 {
     private Point3D start, end;
-    private double radius;
+
 
     public DrawLine(Point3D start, Point3D end)
     {
         this.start=start;
         this.end=end;
-        this.radius=0.04;
+        this.setRadius(0.04);
         createLine();
     }
     public DrawLine(Point3D start, Point3D end, double radius)
     {
         this.start=start;
         this.end=end;
-        this.radius=radius;
+        this.setRadius(radius);
         createLine();
     }
     public DrawLine(Point3D start, Point3D end, double radius, Color col1)
     {
         this.start=start;
         this.end=end;
-        this.radius=radius;
+        this.setRadius(radius);
         this.setMaterial(new PhongMaterial(col1));
         createLine();
     }
@@ -44,7 +44,7 @@ public class DrawLine extends Cylinder
     {
         this.start=start;
         this.end=end;
-        this.radius=0.04;
+        this.setRadius(0.04);
         this.setMaterial(new PhongMaterial(col1));
         createLine();
     }
@@ -77,7 +77,6 @@ public class DrawLine extends Cylinder
         double rotAngle = Math.acos(difference.normalize().dotProduct(new Point3D(0,1,0)));
         this.getTransforms().addAll(new Rotate(-Math.toDegrees(rotAngle), rotateAxis));
 
-        //return line;
     }
 
 }

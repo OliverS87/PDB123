@@ -1,0 +1,35 @@
+.root{
+-fx-background-color: lightblue;
+}
+.button {
+-fx-background-color: darkblue;
+-fx-text-fill: white;
+-fx-font-size: 15px;
+}
+.check-box{
+-fx-text-fill: black;
+}
+.button:hover{
+-fx-background-color: green;
+}
+.slider{
+-fx-background-color: transparent;
+-fx-text-fill: darkblue;
+}
+.slider .axis {
+    -fx-tick-label-fill: black;
+}
+
+.label{
+-fx-background-color: transparent;
+-fx-text-fill: black;
+}
+
+.subsceneBorder{
+-fx-border-style: solid;
+-fx-border-color: black;
+}
+
+.color-picker{
+-fx-color-label-visible:false;
+}

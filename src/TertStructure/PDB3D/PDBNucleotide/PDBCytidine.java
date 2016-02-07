@@ -1,7 +1,7 @@
 package TertStructure.PDB3D.PDBNucleotide;
 
-import GUI.PDB123PrintLog;
-import GUI.PDB123SettingsPresenter;
+import GUI.LogMessagesUI.PDB123PrintLog;
+import GUI.SettingsUI.PDB123SettingsPresenter;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
@@ -21,56 +21,62 @@ import java.util.Collections;
 
 /**
  * Created by oliver on 15.12.15.
- * PDB123StartUp class for representation of PDB nucleotides of Cytidine.
- * Encapsulates three PDB representations:
- *  - Ribose
- *  - Nucleoside
- *  - Backbone
- * Class is called by PDBreader. Ribose, Nucleoside and Backbone classes
- * are generated automatically.
- * Returns a collective 3D Structure group containing Ribose, Nucleoside and Backbone.
- * In addition, lines connecting residues and additional atoms can be added.
- * Allows direct access to 5' and 3' end to allow connection of residues in final
- * 3D structure.
- * 3D structure is generated with TertStructure.RNA3DComponents package.
+ * PDBCytidine represents one Cytidine nucleotide. Inherits
+ * common interface of all nucleotides from PDBNucleotide.
+ * Extends Group. Elements of groups are only created after
+ * getStructure() is called.
  */
-public class PDBCytidine extends PDBNucleotide
-{
+public class PDBCytidine extends PDBNucleotide {
+    // Cytidine consists of a
+    // - sugar: ribo
+    // - nucleobase: cyt
+    // - a phosphat backbone: pbb
     private PDBRibose ribo;
     private PDBCytosine cyt;
     private PDBBackbone pbb;
+    // PDBCytidine has two Color properties, one for unselected and selected state.
     private ObjectProperty<Color> unselected, selected;
 
-    public PDBCytidine(PDB123PrintLog log,PDB123SettingsPresenter settings) {
+    public PDBCytidine(PDB123PrintLog log, PDB123SettingsPresenter settings) {
         super(log, settings);
         this.ribo = new PDBRibose();
         this.cyt = new PDBCytosine();
         this.pbb = new PDBBackbone();
         // Keep track of atoms with undefined coordinates
         defAtoms = new ArrayList<>(Collections.nCopies(24, false));
-        // Add listener
-        addListener();
+        // Add color mode listener
+        addColorModeListener();
         // Set initial color mode
         setColorMode(settings.colorModeProperty().getValue());
     }
 
+    // Get substructures
     public PDBRibose getRibose() {
         return ribo;
     }
-
     public PDBCytosine getCytosine() {
         return cyt;
     }
-
     public PDBBackbone getPbb() {
         return pbb;
     }
+    // Get coordinates of 5' and 3' end
+    @Override
+    public Point3D getFivePrimeEnd() {
+        return this.pbb.getP();
+    }
+    @Override
+    public Point3D getThreePrimeEnd() {
+        return this.ribo.getO3();
+    }
 
-    // Return 3D structure. Add connecting lines between individual parts.
+
+    // Init. 3D structure. Add connecting lines between individual parts.
     // Visibility of components can be activated/deactivated by user
     @Override
     public void getStructure(BooleanProperty showBackbone, BooleanProperty showSugar, BooleanProperty showBase) {
-        if (!this.allAtomsDefined()) printLog.printLogMessage("WARNING: Cyt_"+this.getResIndex()+" not completely defined.");
+        if (!this.allAtomsDefined())
+            printLog.printLogMessage("WARNING: Cytosine " + this.getResIndex() + " has undefined atoms.");
         Group cytidineGrp = new Group();
         PhongMaterial cytMaterial = new PhongMaterial();
         // Build structure for ribose, nucleobase and phosphat backbone
@@ -92,18 +98,15 @@ public class PDBCytidine extends PDBNucleotide
         c1toN1.visibleProperty().bind(showSugar.and(showBase));
         // Connect ribose and phosphat
         // Check if phosphat is present (might not be available in first residue of chain)
-        if (pbb.getP() == null)
-        {
+        if (pbb.getP() == null) {
             cytidineGrp.getChildren().addAll(c1toN1);
-
-        }
-        else {
+        } else {
             // Connect ribose and phosphat
             DrawLine o5ToP = new DrawLine(ribo.getO5(), pbb.getP());
             o5ToP.visibleProperty().bind(showSugar.and(showBackbone));
             cytidineGrp.getChildren().addAll(c1toN1, o5ToP);
         }
-        Tooltip.install(this, new Tooltip("Cyt_"+this.getResIndex()));
+        Tooltip.install(this, new Tooltip("Cytosine " + this.getResIndex()));
         this.getChildren().add(cytidineGrp);
     }
 
@@ -111,77 +114,185 @@ public class PDBCytidine extends PDBNucleotide
     // Colormode could be:
     // - Type of residue
     // - Purin or Pyrimidine
-    private void setColorMode(String colorMode)
-    {
-        switch (colorMode){
-            case("resType"):{
+    private void setColorMode(String colorMode) {
+        switch (colorMode) {
+            case ("resType"): {
                 this.unselected = this.getSettings().cytUnselectedColorProperty();
                 this.selected = this.getSettings().cytSelectedColorProperty();
 
-            } break;
-            case("baseType"):{
+            }
+            break;
+            case ("baseType"): {
                 this.unselected = this.getSettings().pyrUnselectedColorProperty();
                 this.selected = this.getSettings().pyrSelectedColorProperty();
-            } break;
+            }
+            break;
 
         }
         // Bind color to selection state
         this.ntColorProperty().bind(Bindings.when(isSelectedProperty()).then(selected).otherwise(unselected));
     }
 
-    private void addListener()
-    {
+    private void addColorModeListener() {
         StringProperty colorModeProperty = this.getSettings().colorModeProperty();
         colorModeProperty.addListener((observable, oldValue, newValue) -> setColorMode(newValue));
 
     }
 
 
-    // Get coordinates of 5' and 3' end
+    // SetAtom converts the PDB raw input into accesible Java Point3D coordinates
+    // String[] atom has this format: [[atomID][X][Y][Z]]
+    // If atomID is unknown, input will be ignored
     @Override
-    public Point3D getFivePrimeEnd() {
-        return this.pbb.getP();
-    }
-
-    @Override
-    public Point3D getThreePrimeEnd() {
-        return this.ribo.getO3();
-    }
-
-    // SetAtom converts the PDB raw input into accesible Java Points3D coordinates
-    @Override
-    public void setAtom(String[] atom)
-    {
+    public void setAtom(String[] atom) {
         double x = Double.parseDouble(atom[1]);
         double y = Double.parseDouble(atom[2]);
         double z = Double.parseDouble(atom[3]);
-        Point3D xyz = new Point3D(x,y,z);
-        switch (atom[0])
-        {
-            case("P"): {pbb.setP(xyz); defAtoms.set(0,true); break;}
-            case("OP1"): pbb.setOP1(xyz); {defAtoms.set(1,true); break;}
-            case("OP2"): pbb.setOP2(xyz); {defAtoms.set(2,true); break;}
-            case("C1'"): ribo.setC1(xyz); {defAtoms.set(3,true); break;}
-            case("C2'"): ribo.setC2(xyz); {defAtoms.set(4,true); break;}
-            case("C3'"): ribo.setC3(xyz); {defAtoms.set(5,true); break;}
-            case("C4'"): ribo.setC4(xyz); {defAtoms.set(6,true); break;}
-            case("C5'"): ribo.setC5(xyz); {defAtoms.set(7,true); break;}
-            case("O2'"): ribo.setO2(xyz); {defAtoms.set(8,true); break;}
-            case("O3'"): ribo.setO3(xyz); {defAtoms.set(9,true); break;}
-            case("O4'"): ribo.setO4(xyz); {defAtoms.set(10,true); break;}
-            case("O5'"): ribo.setO5(xyz); {defAtoms.set(11,true); break;}
-            case("C2"): cyt.setC2(xyz);  {defAtoms.set(12,true); break;}
-            case("C4"): cyt.setC4(xyz);  {defAtoms.set(13,true); break;}
-            case("C5"): cyt.setC5(xyz);  {defAtoms.set(14,true); break;}
-            case("C6"): cyt.setC6(xyz);  {defAtoms.set(15,true); break;}
-            case("N1"): cyt.setN1(xyz);  {defAtoms.set(16,true); break;}
-            case("N3"): cyt.setN3(xyz);  {defAtoms.set(17,true); break;}
-            case("N4"): cyt.setN4(xyz);  {defAtoms.set(18,true); break;}
-            case("O2"): cyt.setO2(xyz);  {defAtoms.set(19,true); break;}
-            case("H41"): cyt.setH41(xyz);  {defAtoms.set(20,true); break;}
-            case("H42"): cyt.setH42(xyz);  {defAtoms.set(21,true); break;}
-            case("H5"): cyt.setH5(xyz);  {defAtoms.set(22,true); break;}
-            case("H6"): cyt.setH6(xyz);  {defAtoms.set(23,true); break;}
+        Point3D xyz = new Point3D(x, y, z);
+        switch (atom[0]) {
+            case ("P"): {
+                pbb.setP(xyz);
+                defAtoms.set(0, true);
+                break;
+            }
+            case ("OP1"):
+                pbb.setOP1(xyz);
+            {
+                defAtoms.set(1, true);
+                break;
+            }
+            case ("OP2"):
+                pbb.setOP2(xyz);
+            {
+                defAtoms.set(2, true);
+                break;
+            }
+            case ("C1'"):
+                ribo.setC1(xyz);
+            {
+                defAtoms.set(3, true);
+                break;
+            }
+            case ("C2'"):
+                ribo.setC2(xyz);
+            {
+                defAtoms.set(4, true);
+                break;
+            }
+            case ("C3'"):
+                ribo.setC3(xyz);
+            {
+                defAtoms.set(5, true);
+                break;
+            }
+            case ("C4'"):
+                ribo.setC4(xyz);
+            {
+                defAtoms.set(6, true);
+                break;
+            }
+            case ("C5'"):
+                ribo.setC5(xyz);
+            {
+                defAtoms.set(7, true);
+                break;
+            }
+            case ("O2'"):
+                ribo.setO2(xyz);
+            {
+                defAtoms.set(8, true);
+                break;
+            }
+            case ("O3'"):
+                ribo.setO3(xyz);
+            {
+                defAtoms.set(9, true);
+                break;
+            }
+            case ("O4'"):
+                ribo.setO4(xyz);
+            {
+                defAtoms.set(10, true);
+                break;
+            }
+            case ("O5'"):
+                ribo.setO5(xyz);
+            {
+                defAtoms.set(11, true);
+                break;
+            }
+            case ("C2"):
+                cyt.setC2(xyz);
+            {
+                defAtoms.set(12, true);
+                break;
+            }
+            case ("C4"):
+                cyt.setC4(xyz);
+            {
+                defAtoms.set(13, true);
+                break;
+            }
+            case ("C5"):
+                cyt.setC5(xyz);
+            {
+                defAtoms.set(14, true);
+                break;
+            }
+            case ("C6"):
+                cyt.setC6(xyz);
+            {
+                defAtoms.set(15, true);
+                break;
+            }
+            case ("N1"):
+                cyt.setN1(xyz);
+            {
+                defAtoms.set(16, true);
+                break;
+            }
+            case ("N3"):
+                cyt.setN3(xyz);
+            {
+                defAtoms.set(17, true);
+                break;
+            }
+            case ("N4"):
+                cyt.setN4(xyz);
+            {
+                defAtoms.set(18, true);
+                break;
+            }
+            case ("O2"):
+                cyt.setO2(xyz);
+            {
+                defAtoms.set(19, true);
+                break;
+            }
+            case ("H41"):
+                cyt.setH41(xyz);
+            {
+                defAtoms.set(20, true);
+                break;
+            }
+            case ("H42"):
+                cyt.setH42(xyz);
+            {
+                defAtoms.set(21, true);
+                break;
+            }
+            case ("H5"):
+                cyt.setH5(xyz);
+            {
+                defAtoms.set(22, true);
+                break;
+            }
+            case ("H6"):
+                cyt.setH6(xyz);
+            {
+                defAtoms.set(23, true);
+                break;
+            }
 
         }
 
@@ -192,6 +303,7 @@ public class PDBCytidine extends PDBNucleotide
     public String getType() {
         return "C";
     }
+
     @Override
     // Return a central coordinate
     // Needed to estimate the distance to other nucleotides

@@ -9,6 +9,8 @@ import TertStructure.RNA3DComponents.DrawLine;
 /**
  * Created by oliver on 14.12.15.
  * Stores coordinates of an RNA backbone
+ * Backbone consists only of phosphat group.
+ * Hydroxy-group is displayed by PDBSugar.
  * Returns 3D structure of backbone
  */
 public class PDBBackbone {
@@ -37,15 +39,16 @@ public class PDBBackbone {
     public void setOP2(Point3D OP2) {
         this.OP2 = OP2;
     }
-    public Group getStructure(){
+
+    public Group getStructure() {
         Group backboneGrp = new Group();
         // Check if phosphat is present (not found in first residue of chain)
-        if (P==null) return backboneGrp;
+        if (P == null) return backboneGrp;
         // Draw Phosphat
         DrawPhosphat phosphat = new DrawPhosphat(P);
         // Draw Oxygens
-        DrawOxygen oxygen1=new DrawOxygen(OP1);
-        DrawOxygen oxygen2=new DrawOxygen(OP2);
+        DrawOxygen oxygen1 = new DrawOxygen(OP1);
+        DrawOxygen oxygen2 = new DrawOxygen(OP2);
 
         // Connect Phosphat and oxygens
         DrawLine pToOp1 = new DrawLine(P, OP1);

@@ -28,8 +28,7 @@ public class PDBUracil extends PDBPyrimidine {
         H3 = h3;
     }
 
-    public Group getStructure()
-    {
+    public Group getStructure() {
         Group uracilGrp = new Group();
         // Draw a pyrimidine ring
         DrawPyrimidine drawUracile = new DrawPyrimidine(this.getN1(), this.getC2(), this.getN3(), this.getC4(), this.getC5(), this.getC6());

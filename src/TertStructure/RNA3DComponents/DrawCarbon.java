@@ -11,17 +11,17 @@ import javafx.scene.shape.Sphere;
  */
 public class DrawCarbon extends Sphere {
     private static double ATOMRADIUS = 0.67;
-    public DrawCarbon(Point3D carbonXYZ){
+
+    public DrawCarbon(Point3D carbonXYZ) {
         // Do not show carbon if coordinate is undefined
-        if (carbonXYZ==null){
+        if (carbonXYZ == null) {
             this.setVisible(false);
-        }
-        else{
-        this.setRadius(ATOMRADIUS);
-        this.setTranslateX(carbonXYZ.getX());
-        this.setTranslateY(carbonXYZ.getY());
-        this.setTranslateZ(carbonXYZ.getZ());
-        this.setMaterial(new PhongMaterial(Color.CHOCOLATE));
+        } else {
+            this.setRadius(ATOMRADIUS);
+            this.setTranslateX(carbonXYZ.getX());
+            this.setTranslateY(carbonXYZ.getY());
+            this.setTranslateZ(carbonXYZ.getZ());
+            this.setMaterial(new PhongMaterial(Color.CHOCOLATE));
         }
     }
 }

@@ -3,28 +3,20 @@ package SecStructure.RNA2D;
 import SelectionModel.PDB123SelectionModel;
 import SelectionModel.Selectable;
 import javafx.beans.binding.Bindings;
-import javafx.beans.binding.DoubleExpression;
-import javafx.beans.binding.NumberBinding;
 import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.scene.control.Tooltip;
-import javafx.scene.effect.Bloom;
-import javafx.scene.effect.GaussianBlur;
-import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 
 /**
  * Created by oliver on 30.11.15.
- * Shape for RNa2DNode based on Circle
+ * Representation for RNA 2D Node. Based on circle.
  */
-public class Rna2DNode extends Circle implements Selectable
-{
+public class Rna2DNode extends Circle implements Selectable {
     // X/Y coordinates property bindings
     private SimpleDoubleProperty posX = new SimpleDoubleProperty();
     private SimpleDoubleProperty posY = new SimpleDoubleProperty();
     private BooleanProperty isSelected;
-    private BooleanProperty greyScaleOnHL = new SimpleBooleanProperty(false);
 
     // Index of node in structure
     private int nodeNr;
@@ -36,12 +28,12 @@ public class Rna2DNode extends Circle implements Selectable
         this.setRadius(radius);
         this.centerXProperty().bind(this.posX);
         this.centerYProperty().bind(this.posY);
-        this.nodeNr=nodeNr;
-        this.isSelected=isSelected;
-        this.radiusProperty().bind(Bindings.when(isSelected).then(radius*1.2).otherwise(radius));
+        this.nodeNr = nodeNr;
+        this.isSelected = isSelected;
+        // Radius depends on selection status
+        // -> node is enlarged when selected
+        this.radiusProperty().bind(Bindings.when(isSelected).then(radius * 1.2).otherwise(radius));
     }
-
-
 
     public SimpleDoubleProperty posXProperty() {
         return posX;
@@ -64,8 +56,7 @@ public class Rna2DNode extends Circle implements Selectable
     }
 
     // Set tooltip according to associated character
-    public void identify(char nucleotide)
-    {
+    public void identify(char nucleotide) {
         String ntId;
 
         switch (nucleotide) {
@@ -100,7 +91,6 @@ public class Rna2DNode extends Circle implements Selectable
         PDB123SelectionModel.addMouseHandler(this);
 
 
-
     }
 
     @Override
@@ -110,11 +100,8 @@ public class Rna2DNode extends Circle implements Selectable
 
     @Override
     public void setSelected(boolean sel) {
-    isSelected.setValue(sel);
+        isSelected.setValue(sel);
     }
 
-    @Override
-    public void setHLGreyscale(boolean hl) {
-        greyScaleOnHL.setValue(hl);
-    }
+
 }

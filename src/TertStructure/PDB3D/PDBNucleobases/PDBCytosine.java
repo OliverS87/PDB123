@@ -36,9 +36,9 @@ public class PDBCytosine extends PDBPyrimidine {
     public void setN4(Point3D n4) {
         N4 = n4;
     }
+
     // Get 3D structure
-    public Group getStructure()
-    {
+    public Group getStructure() {
         Group cytosineGrp = new Group();
         // Draw a pyrimidine ring
         DrawPyrimidine drawCytosine = new DrawPyrimidine(this.getN1(), this.getC2(), this.getN3(), this.getC4(), this.getC5(), this.getC6());

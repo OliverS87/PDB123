@@ -12,8 +12,7 @@ import TertStructure.RNA3DComponents.DrawPurin;
  * Stores PDB coordinates of one Adenine.
  * Returns 3D structure.
  */
-public class PDBAdenine extends PDBPurin
-{
+public class PDBAdenine extends PDBPurin {
 
     private Point3D N6, H2, H61, H62;
 
@@ -50,8 +49,7 @@ public class PDBAdenine extends PDBPurin
     }
 
 
-    public Group getStructure()
-    {
+    public Group getStructure() {
         Group adenineGGrp = new Group();
         // Draw a purin ring
         DrawPurin drawAdenine = new DrawPurin(this.getN1(), this.getC2(), this.getN1(), this.getC4(), this.getN9(), this.getC8(), this.getN7(), this.getC5(), this.getC6());
@@ -71,7 +69,7 @@ public class PDBAdenine extends PDBPurin
 
 
         adenineGGrp.getChildren().addAll(meshV, hydrogen2, hydrogen61, hydrogen62, hydrogen8, nitrogen6,
-        h2purin, h8purin,n6purin,h61n6,h62n6);
+                h2purin, h8purin, n6purin, h61n6, h62n6);
         return adenineGGrp;
     }
 }

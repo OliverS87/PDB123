@@ -1,0 +1,16 @@
+.root{
+-fx-background-color: radial-gradient(center 100% 0%, radius 20%, white, yellow, black);
+}
+.button{
+-fx-background-color: white;
+-fx-text-fill: black;
+}
+.button:hover{
+-fx-background-color: red;
+-fx-text-fill: white;
+}
+.label{
+-fx-background-color: transparent;
+-fx-text-fill: white;
+}
+

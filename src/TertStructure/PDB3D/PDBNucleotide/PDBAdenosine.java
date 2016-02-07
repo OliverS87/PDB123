@@ -1,11 +1,10 @@
 package TertStructure.PDB3D.PDBNucleotide;
 
-import GUI.PDB123PrintLog;
-import GUI.PDB123SettingsPresenter;
+import GUI.LogMessagesUI.PDB123PrintLog;
+import GUI.SettingsUI.PDB123SettingsPresenter;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.geometry.Point3D;
 import javafx.scene.Group;
@@ -22,24 +21,21 @@ import java.util.Collections;
 
 /**
  * Created by oliver on 15.12.15.
- * PDB123StartUp class for representation of PDB nucleotides of Adenosine.
- * Encapsulates three PDB representations:
- *  - Ribose
- *  - Nucleoside
- *  - Backbone
- * Class is called by PDBreader. Ribose, Nucleoside and Backbone classes
- * are generated automatically.
- * Returns a collective 3D Structure group containing Ribose, Nucleoside and Backbone.
- * In addition, lines connecting residues and additional atoms can be added.
- * Allows direct access to 5' and 3' end to allow connection of residues in final
- * 3D structure.
- * 3D structure is generated with TertStructure.RNA3DComponents package.
+ * PDBAdenosine represents one Adenosine nucleotide. Inherits
+ * common interface of all nucleotides from PDBNucleotide.
+ * Extends Group. Elements of groups are only created after
+ * getStructure() is called.
  */
 public class PDBAdenosine extends PDBNucleotide
 {
+    // Adensosine consists of a
+    // - sugar: ribo
+    // - nucleobase: ade
+    // - a phosphat backbone: pbb
     private PDBRibose ribo;
     private PDBAdenine ade;
     private PDBBackbone pbb;
+    // PDBAdenosine has two Color properties, one for unselected and selected state.
     private ObjectProperty<Color> unselected, selected;
 
     public PDBAdenosine(PDB123PrintLog log,PDB123SettingsPresenter settings) {
@@ -49,13 +45,14 @@ public class PDBAdenosine extends PDBNucleotide
         this.pbb = new PDBBackbone();
         // Keep track of atoms with undefined coordinates
         defAtoms = new ArrayList<>(Collections.nCopies(26, false));
-        // Add listener
-        addListener();
+        // Add color mode listener
+        addColorModeListener();
         // Set initial color mode
         setColorMode(settings.colorModeProperty().getValue());
 
     }
 
+    // Get substructures
     public PDBRibose getRibose() {
         return ribo;
     }
@@ -65,23 +62,21 @@ public class PDBAdenosine extends PDBNucleotide
     public PDBBackbone getPbb() {
         return pbb;
     }
-
     // Get coordinates of 5' and 3' end
     @Override
     public Point3D getFivePrimeEnd() {
         return this.pbb.getP();
     }
-
     @Override
     public Point3D getThreePrimeEnd() {
         return this.ribo.getO3();
     }
 
-    // Return 3D structure. Add connecting lines between individual parts.
+    // Init. 3D structure. Add connecting lines between individual parts.
     // Visibility of components can be activated/deactivated by user
     @Override
     public void getStructure(BooleanProperty showBackbone, BooleanProperty showSugar, BooleanProperty showBase) {
-        if (!this.allAtomsDefined()) printLog.printLogMessage("WARNING: Ade_"+this.getResIndex()+" not completely defined.");
+        if (!this.allAtomsDefined()) printLog.printLogMessage("WARNING: Adenosine "+this.getResIndex()+" has undefined atoms.");
         Group adenosineGrp = new Group();
         PhongMaterial adeMaterial = new PhongMaterial();
         adeMaterial.diffuseColorProperty().bind(this.ntColorProperty());
@@ -103,22 +98,20 @@ public class PDBAdenosine extends PDBNucleotide
         if (pbb.getP() == null)
         {
             adenosineGrp.getChildren().addAll(c1ToN9);
-
         }
         else {
             // Connect phosphatgroup and ribose
             DrawLine o5ToP = new DrawLine(ribo.getO5(), pbb.getP());
             o5ToP.visibleProperty().bind(showBackbone.and(showSugar));
             adenosineGrp.getChildren().addAll(c1ToN9, o5ToP);
-
         }
         // Add tooltip
-        Tooltip.install(this, new Tooltip("Ade_"+this.getResIndex()));
+        Tooltip.install(this, new Tooltip("Adenosine "+this.getResIndex()));
         this.getChildren().add(adenosineGrp);
     }
 
 
-    private void addListener()
+    private void addColorModeListener()
     {
         StringProperty colorModeProperty = this.getSettings().colorModeProperty();
         colorModeProperty.addListener((observable, oldValue, newValue) -> setColorMode(newValue));
@@ -134,7 +127,6 @@ public class PDBAdenosine extends PDBNucleotide
                 case("resType"):{
                     this.unselected = this.getSettings().adeUnselectedColorProperty();
                     this.selected = this.getSettings().adeSelectedColorProperty();
-
                 } break;
                 case("baseType"):{
                     this.unselected = this.getSettings().purUnselectedColorProperty();
@@ -144,7 +136,10 @@ public class PDBAdenosine extends PDBNucleotide
             // Bind color to selection state
             this.ntColorProperty().bind(Bindings.when(isSelectedProperty()).then(selected).otherwise(unselected));
     }
-    // SetAtom converts the PDB raw input into accesible Java Points3D coordinates
+
+    // SetAtom converts the PDB raw input into accesible Java Point3D coordinates
+    // String[] atom has this format: [[atomID][X][Y][Z]]
+    // If atomID is unknown, input will be ignored
     @Override
     public void setAtom(String[] atom)
     {
@@ -180,12 +175,8 @@ public class PDBAdenosine extends PDBNucleotide
             case("H2"): {ade.setH2(xyz); defAtoms.set(23, true); break;}
             case("H61"): {ade.setH61(xyz); defAtoms.set(24, true); break;}
             case("H62"): {ade.setH62(xyz); defAtoms.set(25, true); break;}
-
         }
-
     }
-
-
 
     @Override
     public String getType() {

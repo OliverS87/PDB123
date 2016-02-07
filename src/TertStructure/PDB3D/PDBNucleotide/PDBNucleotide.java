@@ -1,11 +1,10 @@
 package TertStructure.PDB3D.PDBNucleotide;
 
-import GUI.PDB123PrintLog;
-import GUI.PDB123SettingsPresenter;
+import GUI.LogMessagesUI.PDB123PrintLog;
+import GUI.SettingsUI.PDB123SettingsPresenter;
 import SecStructure.RNA2D.Rna2DNode;
 import SelectionModel.PDB123SelectionModel;
 import SelectionModel.Selectable;
-import TertStructure.PDB3D.PDBSugar.PDBRibose;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -18,31 +17,48 @@ import java.util.ArrayList;
 
 /**
  * Created by oliver on 15.12.15.
- * Common functions for all PDBNucleotides.
- * Allows access to structure and 5', 3' end
- * without knowledge about the actual type of residue
+ * Abstract class provides functions common to all
+ * four derived nucleotide classes (PDBAdenosine, PDBCytidine,
+ * PDBGuanosine and PDBUridine). Provides a common interface
+ * to access attributes of all four classes without knowledge
+ * of the actual type of residue.
+ * Common interfaces are:
+ * - Set atom coordinates
+ * - Set and get residue index
+ * - Get nucleotide type (A,C,G or U)
+ * - Get 3D structure
+ * - Get Nucleotides 5' and 3' end
+ * - Get central coordinate
+ * - Get or set Nucleotide is base-paired?
+ * - Get or set base-pairing partner
+ * - Are all atom coordinates defined?
+ * - Get isSelected boolean property
+ * - Get or set 2D representation of this nucleotide
+ * - Get Color property
+ * - Set or get selection state
+ *
+
+
+
  */
 public abstract class PDBNucleotide extends Group implements Selectable{
-    private int resIndex;
-    private BooleanProperty greyScaleOnHL = new SimpleBooleanProperty(false);
+
     private ObjectProperty<Color> ntColor = new SimpleObjectProperty<>();
-    private Rna2DNode rna2DNode;
-    private PDB123SettingsPresenter settings;
     private BooleanProperty isSelected = new SimpleBooleanProperty(false);
-    PDB123PrintLog printLog;
+    private Rna2DNode rna2DNode;
+    private int resIndex;
+    private PDBNucleotide basePairedTo;
+    protected boolean isBasePaired = false;
     // Count number of defined atoms
     ArrayList<Boolean> defAtoms;
-    private PDBNucleotide basePairedTo;
+    private PDB123SettingsPresenter settings;
+    PDB123PrintLog printLog;
 
-    @Override
-    public void setHLGreyscale(boolean hl) {
-        greyScaleOnHL.setValue(hl);
-    }
 
-    // Future: set base pairing status
-    protected boolean isBasePaired = false;
-    public abstract void setAtom(String[] atom);
-
+    // Constructor
+    // Conneect instance PDBNucleotide to log output on main UI
+    // and to settings made in window settings
+    // Register instance at PDB123SelectionModel and add mouse handler
     public PDBNucleotide(PDB123PrintLog log, PDB123SettingsPresenter settings)
     {
         this.printLog = log;
@@ -50,19 +66,25 @@ public abstract class PDBNucleotide extends Group implements Selectable{
         PDB123SelectionModel.registerSelectable(this);
         PDB123SelectionModel.addMouseHandler(this);
     }
-    // Set the position index of the nucleotide
+
+    // Set atom coordinates
+    public abstract void setAtom(String[] atom);
+    // Set/get the position index of the nucleotide
     public void setResIndex(int resIndex) {
         this.resIndex=resIndex;
     }
     public int getResIndex(){
         return this.resIndex;
     }
-
+    // Get nucleotide type
     public abstract String getType();
+    // Init. 3D structure
     public abstract void getStructure(BooleanProperty showBackbone, BooleanProperty showSugar, BooleanProperty showNucleoBase);
+    // Return 5' and 3' end or central coordinate
     public abstract Point3D getFivePrimeEnd();
     public abstract Point3D getThreePrimeEnd();
     public abstract Point3D getCentralCoordinate();
+    // Set or get selection or base-pairing status
     public boolean isBasePaired(){
         return isBasePaired;
     }
@@ -75,25 +97,25 @@ public abstract class PDBNucleotide extends Group implements Selectable{
     public PDBNucleotide getBasePairedTo(){
         return basePairedTo;
     }
+    public BooleanProperty isSelectedProperty() {return isSelected;}
     // Are the coordinates of all atoms set?
     public  boolean allAtomsDefined(){
         return !defAtoms.contains(false);
     };
-    public BooleanProperty isSelectedProperty() {return isSelected;}
+    // Get or set 2D representation of this 3D nucleotide
     public Rna2DNode getRna2DNode(){return  rna2DNode;}
-
     public void setRna2DNode(Rna2DNode rna2DNode) {
         this.rna2DNode = rna2DNode;
     }
-
-    public void setNtColor(Color ntColor) {
-        this.ntColor.set(ntColor);
-    }
-
+    // Get the color property of this nucleotide
     public ObjectProperty<Color> ntColorProperty() {
         return ntColor;
     }
-
+    // Provide access to settings from inherited classes
+    protected PDB123SettingsPresenter getSettings() {
+        return settings;
+    }
+    // Implement functions for MouseSelectionModel
     @Override
     public boolean isSelected() {
         return isSelected.getValue();
@@ -104,9 +126,7 @@ public abstract class PDBNucleotide extends Group implements Selectable{
     isSelected.setValue(sel);
     }
 
-    public PDB123SettingsPresenter getSettings() {
-        return settings;
-    }
+
 
 
 }

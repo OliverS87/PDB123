@@ -1,8 +1,7 @@
 package SecStructure.DotBracketNotation;
 
-import GUI.PDB123PrintLog;
+import GUI.LogMessagesUI.PDB123PrintLog;
 import TertStructure.PDB3D.PDBNucleotide.PDBNucleotide;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Map;
@@ -59,7 +58,6 @@ public class DotBracket {
                    pseudoKnotDetector.addBasePair(i, posNuc2);
                    dotBracketList.set(i, "(");
                    dotBracketList.set(posNuc2, ")");
-                   printLog.printLogMessage("Pair: "+i+" "+posNuc2);
                }
            }
         }
@@ -67,7 +65,7 @@ public class DotBracket {
             ArrayList<Integer[]> pseudoknots = pseudoKnotDetector.detectCross();
             for (Integer[] pseudoKnot : pseudoknots
                     ) {
-                printLog.printLogMessage("Pseudoknot: " + pseudoKnot[0] + " " + pseudoKnot[1]);
+                printLog.printLogMessage("Pseudoknot detected between positions: " + pseudoKnot[0] + " and " + pseudoKnot[1]);
                 dotBracketList.set(pseudoKnot[0], "{");
                 dotBracketList.set(pseudoKnot[1], "}");
 

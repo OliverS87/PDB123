@@ -1,18 +1,15 @@
 package PrimStructure;
 
 import TertStructure.PDB3D.PDBNucleotide.PDBNucleotide;
-import javafx.scene.Group;
 import javafx.scene.text.Text;
-import javafx.scene.text.TextFlow;
-
 import java.util.ArrayList;
 import java.util.Map;
 
 /**
  * Created by oliver on 27.01.16.
- * Returns RNA sequence as string
- * As side-effect the 1D structure is added to
- * the Textflow area
+ * Converts Map<Integer, PDBNucleotide> to
+ * a set of Text objects, each representing one
+ * nucleotide. Returns Text objects as ArrayList
  */
 public class ParsePrimaryStructure
 {
@@ -24,7 +21,6 @@ public class ParsePrimaryStructure
             if (ntMap.containsKey(i))
             {
                 PDBNucleotide currNt = ntMap.get(i);
-              //  sb.append(currNt.getType());
                 NucleotideLetter currLetter = new NucleotideLetter(currNt.getType(), currNt.isSelectedProperty(), i);
                 currLetter.fillProperty().bind(currNt.ntColorProperty());
                 text1D.add(currLetter);

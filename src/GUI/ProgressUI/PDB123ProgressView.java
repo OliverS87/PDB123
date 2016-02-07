@@ -1,4 +1,4 @@
-package GUI;
+package GUI.ProgressUI;
 
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -21,17 +21,17 @@ public class PDB123ProgressView extends VBox {
         initControls();
         setLayout();
     }
-    private void  initControls()
-    {
+
+    private void initControls() {
         progressBar = new ProgressBar();
         label = new Label();
-        button = new Button("Cancel");
+        button = new Button();
     }
-    private void setLayout()
-    {
+
+    private void setLayout() {
         this.getChildren().addAll(progressBar, label, button);
-        this.setSpacing(2);
-        this.setPadding(new Insets(2));
+        this.setSpacing(5);
+        this.setPadding(new Insets(5));
         this.setAlignment(Pos.TOP_CENTER);
     }
 

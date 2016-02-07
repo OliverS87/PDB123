@@ -12,12 +12,38 @@ import TertStructure.RNA3DComponents.DrawRibose;
 
 /**
  * Created by oliver on 15.12.15.
- * PDB123StartUp class for representation of ribose PDB coordinates.
- * Returns 3D structure generated with TertStructure.RNA3DComponents package.
+ * Class collect atom coordinates for the 3D representation
+ * of a nucleotides sugar. Returns a 3D Shape with getStructure()
  */
 public class PDBRibose
 {
     private Point3D C1,C2,C3,C4,C5,O2,O3,O4,O5;
+
+
+    // Group all 3D elements and return as Group
+    // Group contains 3D mesh structure of ribose ring and additional atoms and
+    // connecting lines
+    public Group getStructure(PhongMaterial riboMaterial)
+    {
+        // Do not create a structure if any atom position is not set
+        if (C1==null||C2==null||C3==null||C4==null||C5==null||O2==null||O3==null||O4==null||O5==null) return null;
+        // Draw ribose
+        Group riboseGrp = new Group();
+        DrawRibose drawRibose = new DrawRibose(this.getC1(), this.getC2(), this.getC3(), this.getC4(), this.getO4());
+        MeshView riboseMesh = drawRibose.getRibose();
+        riboseMesh.setMaterial(riboMaterial);
+        riboseGrp.getChildren().add(riboseMesh);
+        // Draw connected C5 and O5
+        DrawCarbon carbon5 = new DrawCarbon(C5);
+        DrawLine c4ToC5 = new DrawLine(C4,C5);
+        DrawOxygen oxygen5 = new DrawOxygen(O5);
+        DrawLine c5ToO5 = new DrawLine(C5,O5);
+        // Draw O3 connected to C3
+        DrawOxygen oxygen3 = new DrawOxygen(O3);
+        DrawLine o3ToC3 = new DrawLine(O3,C3);
+        riboseGrp.getChildren().addAll(carbon5, c4ToC5, oxygen5, c5ToO5, o3ToC3, oxygen3);
+        return riboseGrp;
+    }
 
     public Point3D getC1() {
         return C1;
@@ -89,28 +115,5 @@ public class PDBRibose
 
     public void setO5(Point3D o5) {
         O5 = o5;
-    }
-
-    // Group all 3D elements and return as Group
-    // Group contains 3D mesh structure of ribose ring and additional atoms and
-    // connecting lines
-    public Group getStructure(PhongMaterial riboMaterial)
-    {
-        // Draw ribose
-        Group riboseGrp = new Group();
-        DrawRibose drawRibose = new DrawRibose(this.getC1(), this.getC2(), this.getC3(), this.getC4(), this.getO4());
-        MeshView riboseMesh = drawRibose.getRibose();
-        riboseMesh.setMaterial(riboMaterial);
-        riboseGrp.getChildren().add(riboseMesh);
-        // Draw connected C5 and O5
-        DrawCarbon carbon5 = new DrawCarbon(C5);
-        DrawLine c4ToC5 = new DrawLine(C4,C5);
-        DrawOxygen oxygen5 = new DrawOxygen(O5);
-        DrawLine c5ToO5 = new DrawLine(C5,O5);
-        // Draw O3 connected to C3
-        DrawOxygen oxygen3 = new DrawOxygen(O3);
-        DrawLine o3ToC3 = new DrawLine(O3,C3);
-        riboseGrp.getChildren().addAll(carbon5, c4ToC5, oxygen5, c5ToO5, o3ToC3, oxygen3);
-        return riboseGrp;
     }
 }

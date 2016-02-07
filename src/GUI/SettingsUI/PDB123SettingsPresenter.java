@@ -1,11 +1,7 @@
-package GUI;
+package GUI.SettingsUI;
 
-import javafx.beans.InvalidationListener;
-import javafx.beans.Observable;
-import javafx.beans.binding.Bindings;
 import javafx.beans.property.*;
 import javafx.scene.Scene;
-import javafx.scene.control.CheckBox;
 import javafx.scene.control.Slider;
 import javafx.scene.paint.Color;
 import javafx.stage.Modality;
@@ -13,6 +9,13 @@ import javafx.stage.Stage;
 
 /**
  * Created by oliver on 06.02.16.
+ * Add functionality to the settings view elements
+ * defined in PDB123SettingsView
+ * Settings provides these functionalities:
+ * 1. Set H-Bond detection sensitivity (low to high)
+ * 2. Activate pseudoknot detection
+ * 3. Set nucleotide color mode
+ * 4. Choose colors for nucleotides
  */
 public class PDB123SettingsPresenter {
     private PDB123SettingsView settingsView;
@@ -47,6 +50,7 @@ public class PDB123SettingsPresenter {
         // the values here according to this complex formula:
         // Inverse-Value = MaxValue - Value + MinValue
         detectionSensitivity.bind(hBondSensitivitySlider.maxProperty().subtract(hBondSensitivitySlider.valueProperty()).add(hBondSensitivitySlider.minProperty()));
+        // If the sensitivity slider or the pseudoknot detection checkbox have changed values, we need to redraw the 1D, 2D, 3D structures
         hBondSensitivitySlider.valueProperty().addListener(observable -> {
             needToRedrawStructure = true;
         });
@@ -54,6 +58,11 @@ public class PDB123SettingsPresenter {
             needToRedrawStructure = true;
         });
     }
+    // Button closes the settings stage
+    // Value of local boolean needToRedrawStructure is
+    // set to the public boolean property redraw.
+    // Setting this value only upon closing the settings window
+    // prevents redrawing before all new settings are made.
     private void setButtonAction()
     {
         settingsView.getOk().setOnAction(event -> {
@@ -64,19 +73,28 @@ public class PDB123SettingsPresenter {
 
     private void setStage()
     {
+        // Keep settings window on top
+        // Prevent actions in other window while settings window
+        // is open
         this.settingsStage = new Stage();
-        settingsStage.initModality(Modality.WINDOW_MODAL);
+        settingsStage.initModality(Modality.APPLICATION_MODAL);
         settingsStage.setAlwaysOnTop(true);
         Scene settingsScene = new Scene(settingsView,520,350);
-        settingsScene.getStylesheets().add("GUI/myStyle.css");
+        settingsScene.getStylesheets().add("GUI/settingsStyle.css");
         settingsStage.setScene(settingsScene);
     }
 
+
+    // Getter for stage
+    // When a new settings stage is created,
+    // reset the boolean values for redraw structure to false
     public Stage getSettingsStage() {
         redraw.setValue(false);
         needToRedrawStructure=false;
         return settingsStage;
     }
+
+    // Other getters
     public ObjectProperty<Color> adeUnselectedColorProperty()
     {
         return settingsView.getColorPickAdeUnSel().valueProperty();
@@ -135,13 +153,7 @@ public class PDB123SettingsPresenter {
         return detectPseudoknots.get();
     }
 
-    public BooleanProperty detectPseudoknotsProperty() {
-        return detectPseudoknots;
-    }
 
-    public double getDetectionSensitivity() {
-        return detectionSensitivity.get();
-    }
 
     public DoubleProperty detectionSensitivityProperty() {
         return detectionSensitivity;
