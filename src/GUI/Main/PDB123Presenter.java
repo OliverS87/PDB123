@@ -1,7 +1,7 @@
 package GUI.Main;
 
 import Charts.PDBBarChart;
-import PDBParser.PDB123PresenterStructureTask;
+import PDBParser.PDB123LoadingTask;
 import GUI.LogMessagesUI.PDB123PrintLog;
 import GUI.ProgressUI.PDB123ProgressPresenter;
 import GUI.SettingsUI.PDB123SettingsPresenter;
@@ -103,13 +103,21 @@ public class PDB123Presenter {
             // Try to load a file
             // If file loading canceled -> print message
             // else: print file name
+            // Save previous path
+            String oldPath = path;
             path = null;
             try {
                 path = showFileChooser();
             } catch (Exception e) {
                 printLog.printLogMessage("No file loaded");
             }
-            if (path == null) return;
+            // If no valid path was returned by FileChooser
+            // set path back to old path (if existing)
+            // Do not proceed with file parsing
+            if (path == null){
+                if (oldPath != null) path = oldPath;
+                return;
+            }
             String fileName = path.substring(Math.max(path.lastIndexOf('/'), path.lastIndexOf('\\')) + 1);
             printLog.printLogMessage("File loaded: " + fileName);
             // Reset any applied transformation in 2D and 3D
@@ -370,7 +378,7 @@ public class PDB123Presenter {
         // 1. log-window to output messages
         // 2. Path to PDB file
         // 3. 2D subscene (required to set up bindings for proper resize of that subscene)
-        PDB123PresenterStructureTask task1 = new PDB123PresenterStructureTask(printLog, path, PDB123View.getSubScene2D());
+        PDB123LoadingTask task1 = new PDB123LoadingTask(printLog, path, PDB123View.getSubScene2D());
         // Set references to boolean properties
         task1.setBooleanProperties(showBackbone, showSugar, showNucleoBase, showHBonds);
         // Set reference to settings window to derive current settings

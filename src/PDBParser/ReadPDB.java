@@ -109,6 +109,10 @@ public class ReadPDB
             // Ignore lines NOT starting with ATOM
             if (!line.startsWith("ATOM")) continue;
             // Split line at blankspaces
+            // In some cases there is no blankspace in front
+            // of a minus. Replace those minus letters
+            // with a blankspace followed by a minus
+            line = line.replaceAll("\\-"," \\-");
             String[] lineSplit = line.split("\\s+");
             // Store residue index
             int resIndex = Integer.parseInt(lineSplit[5]);

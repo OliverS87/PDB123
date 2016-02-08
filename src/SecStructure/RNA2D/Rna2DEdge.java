@@ -4,6 +4,7 @@ import SelectionModel.PDB123SelectionModel;
 import SelectionModel.Selectable;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
+import javafx.scene.control.Tooltip;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
 
@@ -33,9 +34,14 @@ public class Rna2DEdge extends Line implements Selectable {
         PDB123SelectionModel.addMouseHandler(this);
     }
 
-    public void checkForPseudoKnot(ArrayList<Integer> listOfPseudoKnottedNts) {
-        if ((listOfPseudoKnottedNts.lastIndexOf(posNt1) != -1) || (listOfPseudoKnottedNts.lastIndexOf(posNt2) != -1)) {
-            System.out.println("dotted line");
+    public void checkForPseudoKnot(ArrayList<Integer[]> listOfPseudoKnottedNts) {
+        for (Integer[] pair: listOfPseudoKnottedNts
+             ) {
+            if ((pair[0]==posNt1) && (pair[1]==posNt2) ||(pair[1]==posNt1) && (pair[0]==posNt2))
+            {// Mark h-bonds belonging to pseudoknots in green and add a tooltip
+            this.strokeProperty().unbind();
+            this.strokeProperty().setValue(Color.GREEN);
+            Tooltip.install(this, new Tooltip("Pseudoknot"));}
         }
     }
 

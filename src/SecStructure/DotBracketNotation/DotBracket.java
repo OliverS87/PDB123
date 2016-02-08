@@ -15,6 +15,7 @@ public class DotBracket {
     private Map<Integer, PDBNucleotide> ntMap;
     private int firstNtIndex, lastNtIndex;
     private PDB123PrintLog printLog;
+    private ArrayList<Integer[]> pseudoknots;
 
     public DotBracket(PDB123PrintLog printLog) {
         this.printLog = printLog;
@@ -31,6 +32,8 @@ public class DotBracket {
     public void setLastNtIndex(int lastNtIndex) {
         this.lastNtIndex = lastNtIndex;
     }
+
+    public ArrayList<Integer[]> getPseudoknots() {return pseudoknots;}
 
     // Compute dot-bracket string
     public String getDotBracket(Boolean detectPseudoKnots)
@@ -62,7 +65,9 @@ public class DotBracket {
            }
         }
         if (detectPseudoKnots) {
-            ArrayList<Integer[]> pseudoknots = pseudoKnotDetector.detectCross();
+            pseudoknots = pseudoKnotDetector.detectCross();
+            // Only proceed if pseudoknots were detected
+            if (pseudoknots != null){
             for (Integer[] pseudoKnot : pseudoknots
                     ) {
                 printLog.printLogMessage("Pseudoknot detected between positions: " + pseudoKnot[0] + " and " + pseudoKnot[1]);
@@ -70,10 +75,10 @@ public class DotBracket {
                 dotBracketList.set(pseudoKnot[1], "}");
 
             }
-        }
+        }}
         // Convert ArrayList to simple string and return
         String dotBracket = String.join("", dotBracketList);
-        printLog.printLogMessage("DotBracketNotation: "+dotBracket);
+        printLog.printLogMessage("Dot-Bracket Notation: "+dotBracket);
         return dotBracket;
     }
 }

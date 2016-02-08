@@ -36,9 +36,9 @@ import java.util.Map;
  * All four objects are returned on one ArrayList<Object>
  */
 
-// PDB123PresenterStructureTask extends Task, it can therefore be run in
+// PDB123LoadingTask extends Task, it can therefore be run in
 // a background thread and still access some elements of the UI
-public class PDB123PresenterStructureTask extends Task<ArrayList<Object>> {
+public class PDB123LoadingTask extends Task<ArrayList<Object>> {
 
     private PDB123PrintLog log;
     private ReadPDB pdbReader;
@@ -48,6 +48,7 @@ public class PDB123PresenterStructureTask extends Task<ArrayList<Object>> {
     private BooleanProperty showBackbone, showSugar, showNucleoBase, showHBonds;
     private SubScene subScene2D;
     private PDB123SettingsPresenter settings;
+    private ArrayList<Rna2DEdge> rna2DEdges;
 
 
     // Task needs access to the following objects:
@@ -60,7 +61,7 @@ public class PDB123PresenterStructureTask extends Task<ArrayList<Object>> {
     // 4. are set by setBooleanProperties()
     // 5. are set by setSettings()
 
-    public PDB123PresenterStructureTask(PDB123PrintLog log, String pdbFilePath, SubScene subScene2D) {
+    public PDB123LoadingTask(PDB123PrintLog log, String pdbFilePath, SubScene subScene2D) {
         this.log = log;
         pdbReader = new ReadPDB(log);
         this.pdbFilePath = pdbFilePath;
@@ -102,7 +103,7 @@ public class PDB123PresenterStructureTask extends Task<ArrayList<Object>> {
         Group rna2DStructure = new Group();
         ArrayList<Text> rna1DStructure;
         ArrayList<Rna2DNode> rna2DNodes = new ArrayList<>();
-        ArrayList<Rna2DEdge> rna2DEdges = new ArrayList<>();
+        rna2DEdges = new ArrayList<>();
         // Container structure for all return values
         ArrayList<Object> structure123D = new ArrayList<>(4);
         // Reset selection model
@@ -238,7 +239,16 @@ public class PDB123PresenterStructureTask extends Task<ArrayList<Object>> {
         dotBracket.setLastNtIndex(lastNtIndex);
         // Calculate dotBracket notation and return as String
         // Boolean parameter tells if pseudoknots should be marked in dotBracket sequence
-        return dotBracket.getDotBracket(settings.getDetectPseudoknots());
+        String dotBracketSeq = dotBracket.getDotBracket(settings.getDetectPseudoknots());
+        // If pseudoknots should be detected, mark detected pseudoknots in 2D
+        if (settings.getDetectPseudoknots()) {
+            ArrayList<Integer[]> pseudoknots = dotBracket.getPseudoknots();
+            for (Rna2DEdge edge:rna2DEdges
+                 ) {
+                edge.checkForPseudoKnot(pseudoknots);
+            }
+        }
+        return dotBracketSeq;
     }
 
     // Produce secondary structure from dot-bracket-sequence and with 2D nodes and edges generated before

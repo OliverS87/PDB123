@@ -1,6 +1,6 @@
 package GUI.ProgressUI;
 
-import PDBParser.PDB123PresenterStructureTask;
+import PDBParser.PDB123LoadingTask;
 import javafx.beans.binding.Bindings;
 import javafx.stage.Stage;
 
@@ -13,10 +13,10 @@ import javafx.stage.Stage;
  */
 public class PDB123ProgressPresenter {
     private PDB123ProgressView progressView;
-    private PDB123PresenterStructureTask task;
+    private PDB123LoadingTask task;
     private Stage progressStage;
 
-    public PDB123ProgressPresenter(PDB123PresenterStructureTask task, Stage progressStage) {
+    public PDB123ProgressPresenter(PDB123LoadingTask task, Stage progressStage) {
         progressView = new PDB123ProgressView();
         this.task = task;
         this.progressStage = progressStage;

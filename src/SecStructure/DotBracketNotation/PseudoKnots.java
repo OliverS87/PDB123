@@ -39,6 +39,8 @@ public class PseudoKnots
     // Returns a list of base-pair indices that are pseudoknots.
     public ArrayList<Integer[]> detectCross()
     {
+        // return null if no pseudoknots were detected
+        if (basePairsLst.size()==0) return null;
         do {
             resetConflictScore();
             for (BasePairs pseudoKnotCandidateBP: basePairsLst
@@ -49,7 +51,6 @@ public class PseudoKnots
 
                 }
             }
-            System.out.println(basePairsLst.get(0).conflictScore);
             removeMostConflictingBasepair();
         }
         while(hasCrossingBasePairs());
@@ -57,8 +58,12 @@ public class PseudoKnots
     }
 
     // Detect if two base-pairs are intercalated
+    // Algorithm appears to produce false-positives when base-pairs are formed
+    // between nucleotides with short distances in the chain. Therefore consider
+    // only base-pairs between more distant nucleotides as potential pseudoknots.
     private boolean crossingBasePair(BasePairs bp1, BasePairs bp2)
     {
+        if ((Math.abs(bp1.start-bp1.end) <= 10) || (Math.abs(bp2.start-bp2.end) <= 10)) return false;
         Boolean cross = ((bp1.start < bp2.start) && (bp1.end < bp2.end)) || ((bp1.start > bp2.start) && (bp1.end > bp2.end));
         return cross;
     }
@@ -105,19 +110,6 @@ public class PseudoKnots
         }
     }
 
-    // Main function for testing only
-    public static void main (String args[])
-    {
-        System.out.println("Welcome to pseudoknot removal");
-        PseudoKnots remove = new PseudoKnots();
-        remove.addBasePair(2,15);
-        remove.addBasePair(4,17);
-        remove.addBasePair(5,16);
-        remove.addBasePair(6,14);
-        remove.addBasePair(3,9);
-        remove.addBasePair(7,13);
-        System.out.println(remove.detectCross().toString());
-    }
 
     // Internal representation of a base-pair
     // Adds a field for the conflict score to the start and end position of the base-pair
