@@ -5,7 +5,7 @@ import GUI.SettingsUI.PDB123SettingsPresenter;
 import SecStructure.RNA2D.Rna2DEdge;
 import TertStructure.PDB3D.PDBNucleotide.*;
 import TertStructure.RNA3DComponents.DrawHydrogenBond;
-import com.sun.org.apache.xpath.internal.operations.Bool;
+//import com.sun.org.apache.xpath.internal.operations.Bool;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.geometry.Point3D;
