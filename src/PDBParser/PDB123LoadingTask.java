@@ -81,7 +81,7 @@ public class PDB123LoadingTask extends Task<ArrayList<Object>> {
 
 
     // A task is executed with call()
-    // Status of task is regulary updated with updateMessage
+    // Status of task is regularly updated with updateMessage
     // and updateProgress
     @Override
     public ArrayList<Object> call() throws Exception {
@@ -90,7 +90,7 @@ public class PDB123LoadingTask extends Task<ArrayList<Object>> {
         // Add some short breaks
         // so that user can enjoy the progress bar
         Thread.sleep(300);
-        // Provide settings and filepath to PDBReader
+        // Provide settings and file path to PDBReader
         pdbReader.setSettings(settings);
         pdbReader.setFilePath(pdbFilePath);
         // Retrieve hashmap with PDBNucleotides and first and last

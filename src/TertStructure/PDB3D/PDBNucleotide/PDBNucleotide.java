@@ -56,7 +56,7 @@ public abstract class PDBNucleotide extends Group implements Selectable{
 
 
     // Constructor
-    // Conneect instance PDBNucleotide to log output on main UI
+    // Connect instance PDBNucleotide to log output on main UI
     // and to settings made in window settings
     // Register instance at PDB123SelectionModel and add mouse handler
     public PDBNucleotide(PDB123PrintLog log, PDB123SettingsPresenter settings)

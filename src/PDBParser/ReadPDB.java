@@ -90,7 +90,7 @@ public class ReadPDB
     private void readPDB() throws Exception {
         // currPosIndex: detect if next sequence position is reached
         int currPosIndex = -1;
-        // Stared with arbitrarily low or high values for first and last
+        // Start with arbitrarily low or high values for first and last
         // index position
         firstNtIndex = Integer.MAX_VALUE;
         lastNtIndex = -1;
@@ -126,7 +126,7 @@ public class ReadPDB
             String posX = lineSplit[6];
             String posY = lineSplit[7];
             String posZ = lineSplit[8];
-            // Substract offset/variance to center coordinate at origin
+            // Subtract offset/variance to center coordinate at origin
             // Therefore, coordinate is parsed from String to Double.
             // Afterwards coordinate is parsed back to String format.
             // This is obviously not very efficient. But it is required
