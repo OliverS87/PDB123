@@ -12,6 +12,6 @@ b) Compile from source
 * javac GUI/Main/PDB123StartUp.java
 * java GUI.Main.PDB123StartUp 
 
-###Example files:
-Download some PDB nucleotide structures
-[here](https://www.rcsb.org/pdb/search/smart.do?smartSearchSubtype_1=StructureIdQuery&structureIdList_1=3SUX+4ENC+2FDT+4R4P "Google's Homepage").
+### Example files:
+Download PDB nucleotide structures
+[here](https://www.rcsb.org/pdb/search/smart.do?smartSearchSubtype_1=StructureIdQuery&structureIdList_1=3SUX+4ENC+2FDT+4R4P).
