@@ -1,6 +1,6 @@
 # PDB123
-1D, 2D and 3D visualization of nucleotides in **PDB file format**.
-### Installation/Run instructions:
+1D, 2D and 3D visualization of nucleotide structures in **PDB file format**.
+### Installation/Run instructions
 PDB123 requires Java >= 8.0\
 a) Use the precompiled .jar file
 * Download the .jar file from the "bin" folder.
@@ -12,6 +12,9 @@ b) Compile from source
 * javac GUI/Main/PDB123StartUp.java
 * java GUI.Main.PDB123StartUp 
 
-### Example files:
+### Example files
 Download PDB nucleotide structures
 [here](https://www.rcsb.org/pdb/search/smart.do?smartSearchSubtype_1=StructureIdQuery&structureIdList_1=3SUX+4ENC+2FDT+4R4P).
+
+### Usage
+See the project wiki for detailed usage instructions.
