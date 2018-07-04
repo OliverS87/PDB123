@@ -4,7 +4,7 @@
 PDB123 requires Java >= 8.0\
 a) Use the precompiled .jar file
 * Download the .jar file from the "bin" folder.
-* java -jar 123PDB.jar 
+* java -jar PDB123.jar 
 
 b) Compile from source
 * Checkout/Download the src folder
